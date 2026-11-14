@@ -91,6 +91,23 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 .pill{font-size:.72rem;padding:2px 7px;border-radius:999px;background:var(--lapis-soft);color:var(--lapis);font-variant-numeric:tabular-nums;white-space:nowrap}
 .pill.d{background:var(--gold-soft);color:var(--gold)}
 .note{font-size:.78rem;color:var(--muted)}
+.prog{display:flex;flex-direction:column;gap:14px}
+.prog h3{font:600 1rem var(--f-ui);margin:0 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:1.35rem;color:var(--lapis);font-variant-numeric:tabular-nums}
+.kpi span{font-size:.75rem;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 10px 6px}
+.day{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;font-size:.7rem;color:var(--muted)}
+.stk{width:70%;height:70%;display:flex;flex-direction:column;justify-content:flex-end}.stk:empty,.stk.z{border-bottom:2px solid var(--line)}
+.bar{width:100%;background:var(--lapis)}
+.bar.w{background:var(--bad);border-radius:0}
+.mrow{display:grid;grid-template-columns:110px 1fr 46px;gap:8px;align-items:center;font-size:.85rem}
+.track{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--ok)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 .88rem var(--f-ui);padding:10px 14px;border-radius:999px;min-height:44px;cursor:pointer}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
 @media (prefers-reduced-motion:no-preference){.opt{transition:background .15s,border-color .15s,transform .08s}}
 /* Yatay tutuş: başlık küçülür, seçenekler dört sütun */
 @media (orientation:landscape) and (max-height:500px){
@@ -118,6 +135,7 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
     <button data-mode="anlam">Ad anlamı</button>
     <button data-mode="yer">Mekkî/Medenî</button>
     <button data-mode="liste">Liste</button>
+    <button data-mode="ilerleme">İlerleme</button>
   </nav>
 
   <div class="filter" id="filterBox">
@@ -135,6 +153,7 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
   <div class="weak" id="weak"></div>
   <button class="install" id="install" hidden>Uygulamayı telefona yükle</button>
 
+  <section id="progView" class="prog" hidden></section>
   <section id="listView" hidden>
     <div class="list">
       <input class="search" id="search" type="search" placeholder="Sûre adı, numarası veya anlamı ara" aria-label="Sûre ara">
@@ -147,10 +166,12 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 <script>
 const D=[[1,"الفاتحة","Fâtiha","Açılış",7,"M",5],[2,"البقرة","Bakara","İnek",286,"D",87],[3,"آل عمران","Âl-i İmrân","İmrân Ailesi",200,"D",89],[4,"النساء","Nisâ","Kadınlar",176,"D",92],[5,"المائدة","Mâide","Sofra",120,"D",112],[6,"الأنعام","En'âm","Hayvanlar",165,"M",55],[7,"الأعراف","A'râf","Yüksek Yerler",206,"M",39],[8,"الأنفال","Enfâl","Ganimetler",75,"D",88],[9,"التوبة","Tevbe","Tövbe",129,"D",113],[10,"يونس","Yûnus","Yûnus Peygamber",109,"M",51],[11,"هود","Hûd","Hûd Peygamber",123,"M",52],[12,"يوسف","Yûsuf","Yûsuf Peygamber",111,"M",53],[13,"الرعد","Ra'd","Gök Gürültüsü",43,"D",96],[14,"إبراهيم","İbrâhîm","İbrâhim Peygamber",52,"M",72],[15,"الحجر","Hicr","Semûd'un Yurdu",99,"M",54],[16,"النحل","Nahl","Bal Arısı",128,"M",70],[17,"الإسراء","İsrâ","Gece Yolculuğu",111,"M",50],[18,"الكهف","Kehf","Mağara",110,"M",69],[19,"مريم","Meryem","Hz. Meryem",98,"M",44],[20,"طه","Tâhâ","Tâ Hâ harfleri",135,"M",45],[21,"الأنبياء","Enbiyâ","Peygamberler",112,"M",73],[22,"الحج","Hac","Hac İbadeti",78,"D",103],[23,"المؤمنون","Mü'minûn","Müminler",118,"M",74],[24,"النور","Nûr","Işık",64,"D",102],[25,"الفرقان","Furkân","Hakkı Bâtıldan Ayıran",77,"M",42],[26,"الشعراء","Şuarâ","Şairler",227,"M",47],[27,"النمل","Neml","Karıncalar",93,"M",48],[28,"القصص","Kasas","Kıssalar",88,"M",49],[29,"العنكبوت","Ankebût","Örümcek",69,"M",85],[30,"الروم","Rûm","Rumlar (Bizans)",60,"M",84],[31,"لقمان","Lokmân","Lokmân Hakîm",34,"M",57],[32,"السجدة","Secde","Secde",30,"M",75],[33,"الأحزاب","Ahzâb","Gruplar (Hendek)",73,"D",90],[34,"سبأ","Sebe'","Sebe' Halkı",54,"M",58],[35,"فاطر","Fâtır","Yoktan Yaratan",45,"M",43],[36,"يس","Yâsîn","Yâ Sîn harfleri",83,"M",41],[37,"الصافات","Sâffât","Saf Saf Duranlar",182,"M",56],[38,"ص","Sâd","Sâd harfi",88,"M",38],[39,"الزمر","Zümer","Zümreler",75,"M",59],[40,"غافر","Mü'min (Gâfir)","Bağışlayan",85,"M",60],[41,"فصلت","Fussilet","Açıklanmış",54,"M",61],[42,"الشورى","Şûrâ","Danışma",53,"M",62],[43,"الزخرف","Zuhruf","Altın Süs",89,"M",63],[44,"الدخان","Duhân","Duman",59,"M",64],[45,"الجاثية","Câsiye","Diz Çöken",37,"M",65],[46,"الأحقاف","Ahkâf","Kum Tepeleri",35,"M",66],[47,"محمد","Muhammed","Hz. Muhammed",38,"D",95],[48,"الفتح","Fetih","Zafer",29,"D",111],[49,"الحجرات","Hucurât","Odalar",18,"D",106],[50,"ق","Kâf","Kâf harfi",45,"M",34],[51,"الذاريات","Zâriyât","Savurup Dağıtanlar",60,"M",67],[52,"الطور","Tûr","Tûr Dağı",49,"M",76],[53,"النجم","Necm","Yıldız",62,"M",23],[54,"القمر","Kamer","Ay",55,"M",37],[55,"الرحمن","Rahmân","Rahmân",78,"D",97],[56,"الواقعة","Vâkıa","Kesin Olay",96,"M",46],[57,"الحديد","Hadîd","Demir",29,"D",94],[58,"المجادلة","Mücâdele","Tartışan Kadın",22,"D",105],[59,"الحشر","Haşr","Sürgün",24,"D",101],[60,"الممتحنة","Mümtehine","İmtihan Edilen Kadın",13,"D",91],[61,"الصف","Saf","Saf",14,"D",109],[62,"الجمعة","Cuma","Cuma",11,"D",110],[63,"المنافقون","Münâfikûn","Münafıklar",11,"D",104],[64,"التغابن","Teğâbün","Aldanış",18,"D",108],[65,"الطلاق","Talâk","Boşanma",12,"D",99],[66,"التحريم","Tahrîm","Haram Kılma",12,"D",107],[67,"الملك","Mülk","Hükümranlık",30,"M",77],[68,"القلم","Kalem","Kalem",52,"M",2],[69,"الحاقة","Hâkka","Gerçekleşecek Olan",52,"M",78],[70,"المعارج","Meâric","Yükseliş Yolları",44,"M",79],[71,"نوح","Nûh","Nûh Peygamber",28,"M",71],[72,"الجن","Cin","Cinler",28,"M",40],[73,"المزمل","Müzzemmil","Örtünüp Bürünen",20,"M",3],[74,"المدثر","Müddessir","Örtüsüne Sarınan",56,"M",4],[75,"القيامة","Kıyâme","Kıyamet",40,"M",31],[76,"الإنسان","İnsân","İnsan",31,"D",98],[77,"المرسلات","Mürselât","Gönderilenler",50,"M",33],[78,"النبأ","Nebe'","Haber",40,"M",80],[79,"النازعات","Nâziât","Söküp Çıkaranlar",46,"M",81],[80,"عبس","Abese","Yüzünü Ekşitti",42,"M",24],[81,"التكوير","Tekvîr","Dürülme",29,"M",7],[82,"الانفطار","İnfitâr","Yarılma",19,"M",82],[83,"المطففين","Mutaffifîn","Ölçüde Hile Yapanlar",36,"M",86],[84,"الانشقاق","İnşikâk","Yarılıp Çatlama",25,"M",83],[85,"البروج","Bürûc","Burçlar",22,"M",27],[86,"الطارق","Târık","Gece Gelen",17,"M",36],[87,"الأعلى","A'lâ","En Yüce",19,"M",8],[88,"الغاشية","Ğâşiye","Kuşatan",26,"M",68],[89,"الفجر","Fecr","Tan Vakti",30,"M",10],[90,"البلد","Beled","Şehir",20,"M",35],[91,"الشمس","Şems","Güneş",15,"M",26],[92,"الليل","Leyl","Gece",21,"M",9],[93,"الضحى","Duhâ","Kuşluk Vakti",11,"M",11],[94,"الشرح","İnşirâh","Göğsün Açılması",8,"M",12],[95,"التين","Tîn","İncir",8,"M",28],[96,"العلق","Alak","Aşılanmış Yumurta",19,"M",1],[97,"القدر","Kadir","Değer, Kadir Gecesi",5,"M",25],[98,"البينة","Beyyine","Apaçık Delil",8,"D",100],[99,"الزلزلة","Zilzâl","Deprem",8,"D",93],[100,"العاديات","Âdiyât","Koşan Atlar",11,"M",14],[101,"القارعة","Kâria","Kapıyı Çarpan",11,"M",30],[102,"التكاثر","Tekâsür","Çoklukla Övünme",8,"M",16],[103,"العصر","Asr","Zaman, İkindi",3,"M",13],[104,"الهمزة","Hümeze","Arkadan Çekiştiren",9,"M",32],[105,"الفيل","Fîl","Fil",5,"M",19],[106,"قريش","Kureyş","Kureyş Kabilesi",4,"M",29],[107,"الماعون","Mâûn","Yardımlaşma",7,"M",17],[108,"الكوثر","Kevser","Bol Nimet",3,"M",15],[109,"الكافرون","Kâfirûn","Kâfirler",6,"M",18],[110,"النصر","Nasr","İlâhî Yardım",3,"D",114],[111,"المسد","Tebbet (Mesed)","Hurma Lifi",5,"M",6],[112,"الإخلاص","İhlâs","Samimiyet, Tevhid",4,"M",22],[113,"الفلق","Felak","Sabah Aydınlığı",5,"M",20],[114,"الناس","Nâs","İnsanlar",6,"M",21]].map(r=>({no:r[0],ar:r[1],tr:r[2],mn:r[3],ay:r[4],yer:r[5],nz:r[6]}));
 const KEY="sure-hafizasi-v1";
-let st={right:0,wrong:0,streak:0,miss:{}};
+let st={right:0,wrong:0,streak:0,best:0,miss:{},mode:"mix",range:"1-114",days:{},pm:{},first:null,last:null};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)st=Object.assign(st,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}};
-let mode="mix", range=[1,114], cur=null, answered=false;
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+let mode=st.mode||"mix", range=(st.range||"1-114").split("-").map(Number), cur=null, answered=false;
 const $=s=>document.querySelector(s);
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
 const pool=()=>D.filter(s=>s.no>=range[0]&&s.no<=range[1]);
@@ -206,7 +227,9 @@ function answer(i){
   if(answered)return;answered=true;
   const q=cur,s=q.s,k=q.m+":"+s.no,ok=q.opts[i].ok;
   q.opts.forEach((o,j)=>{const b=$("#o"+j);b.disabled=true;if(o.ok)b.classList.add("right");else if(j===i)b.classList.add("wrong");});
-  if(ok){st.right++;st.streak++;if(st.miss[k]){st.miss[k]--;if(!st.miss[k])delete st.miss[k];}}
+  const dk=today();st.days[dk]=st.days[dk]||[0,0];st.days[dk][ok?0:1]++;
+  st.pm[q.m]=st.pm[q.m]||[0,0];st.pm[q.m][ok?0:1]++;st.first=st.first||dk;st.last=Date.now();
+  if(ok){st.right++;st.streak++;st.best=Math.max(st.best||0,st.streak);if(st.miss[k]){st.miss[k]--;if(!st.miss[k])delete st.miss[k];}}
   else{st.wrong++;st.streak=0;st.miss[k]=Math.min((st.miss[k]||0)+1,5);}
   save();
   $("#fb").outerHTML=`<div class="feedback"><div class="fbhead"><span class="title">${ok?"Doğru.":"Doğrusu işaretlendi."}</span><bdi class="ar" dir="rtl">${s.ar}</bdi></div>
@@ -219,7 +242,7 @@ function answer(i){
 }
 function renderStats(){
   const t=st.right+st.wrong,p=t?Math.round(100*st.right/t):0;
-  $("#stats").innerHTML=`<b>${st.right}</b> doğru · <b>${st.wrong}</b> yanlış · %${p} · seri <b>${st.streak}</b>`;
+  $("#stats").innerHTML=`<b>${st.right}</b> doğru · <b>${st.wrong}</b> yanlış · %${p} · seri <b>${st.streak}</b>${st.last?" · son çalışma "+lastSeen():""}`;
   const ks=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,4);
   $("#weak").innerHTML=ks.length?"Tekrar sıklaştırılanlar: "+ks.map(([k])=>{const [m,n]=k.split(":");const s=D[n-1];return `<b>${s.tr}</b> (${LABEL[m].toLowerCase()})`;}).join(", "):"Yanlış cevaplanan sûreler sonraki sorularda daha sık gelir.";
 }
@@ -229,13 +252,42 @@ function renderList(){
   $("#rows").innerHTML=f.map(s=>`<div class="row"><div class="no">${s.no}</div><div class="mid"><div class="nm">${s.tr}</div><div class="mn">${s.mn} · nüzûl ${s.nz}</div></div>
    <div class="rt"><span class="rar">${s.ar}</span><span><span class="pill">${s.ay} âyet</span> <span class="pill${s.yer==="D"?" d":""}">${yerTxt(s.yer)}</span></span></div></div>`).join("")||`<div class="note">Eşleşen sûre yok. Aramayı kısaltmayı deneyin.</div>`;
 }
-$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
-  mode=b.dataset.mode;document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
-  const list=mode==="liste";$("#listView").hidden=!list;$("#quiz").hidden=list;$("#weak").hidden=list;$("#filterBox").hidden=list;
-  if(list)renderList();else renderQuiz();});
-$("#range").addEventListener("change",e=>{range=e.target.value.split("-").map(Number);renderQuiz();});
+function setMode(m){
+  mode=m;document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===m));
+  const list=m==="liste",prog=m==="ilerleme",other=list||prog;
+  $("#listView").hidden=!list;$("#progView").hidden=!prog;$("#quiz").hidden=other;$("#weak").hidden=other;$("#filterBox").hidden=other;
+  if(list)renderList();else if(prog)renderProg();else renderQuiz();
+  if(!prog){st.mode=m;save();}
+}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setMode(b.dataset.mode);});
+$("#range").addEventListener("change",e=>{st.range=e.target.value;save();range=e.target.value.split("-").map(Number);renderQuiz();});
+const GUN=["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
+function lastSeen(){if(!st.last)return "henüz çalışma yok";const d=Math.floor((new Date().setHours(0,0,0,0)-new Date(st.last).setHours(0,0,0,0))/864e5);
+  return d<=0?"bugün":d===1?"dün":d+" gün önce";}
+function renderProg(){
+  const t=st.right+st.wrong,p=t?Math.round(100*st.right/t):0,nd=Object.keys(st.days).length;
+  const ds=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");ds.push([GUN[d.getDay()],st.days[k]||[0,0]]);}
+  const mx=Math.max(1,...ds.map(([,v])=>v[0]+v[1]));
+  const ms=MODES.map(m=>{const v=st.pm[m]||[0,0],n=v[0]+v[1],r=n?Math.round(100*v[0]/n):0;return `<div class="mrow"><span>${LABEL[m]}</span><div class="track"><div class="fill" style="width:${r}%"></div></div><span>${n?"%"+r:"–"}</span></div>`;}).join("");
+  const wk=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  $("#progView").innerHTML=`<div class="kpis"><div class="kpi"><b>${t}</b><span>soru</span></div><div class="kpi"><b>%${p}</b><span>başarı</span></div><div class="kpi"><b>${nd}</b><span>çalışılan gün</span></div></div>
+   <div class="note">Son çalışma: ${lastSeen()} · en uzun seri: ${st.best||0}${st.first?" · başlangıç: "+st.first.split("-").reverse().join(".") :""}</div>
+   <div><h3>Son 7 gün</h3><div class="days">${ds.map(([g,v])=>`<div class="day"><span>${v[0]+v[1]||""}</span><div class="stk${v[0]+v[1]?"":" z"}"><div class="bar w" style="height:${100*v[1]/mx}%;border-radius:4px 4px 0 0"></div><div class="bar" style="height:${100*v[0]/mx}%"></div></div><span>${g}</span></div>`).join("")}</div><div class="note">Mavi doğru, kırmızı yanlış cevap.</div></div>
+   <div><h3>Türlere göre başarı</h3>${ms}</div>
+   <div><h3>Tekrar edilecekler</h3>${wk.length?`<div class="note">${wk.map(([k,c])=>{const [m,n]=k.split(":");return `<b>${D[n-1].tr}</b> (${LABEL[m].toLowerCase()}, ${c})`;}).join(" · ")}</div>`:`<div class="note">Şu an tekrar bekleyen sûre yok.</div>`}</div>
+   <div><h3>Kayıtlar</h3><div class="note" style="margin-bottom:8px">Çalışmalarınız bu telefonda saklanır. Telefon değiştirirken ya da tarayıcı verilerini silmeden önce yedek alın.</div>
+   <div class="btns"><button class="btn" id="bk">Yedek al</button><button class="btn" id="rs">Yedekten yükle</button><button class="btn danger" id="clr">Sıfırla</button></div>
+   <input type="file" id="fi" accept="application/json,.json" hidden><div class="note" id="pmsg"></div></div>`;
+  $("#bk").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(st)],{type:"application/json"}));a.download="sure-hafizasi-yedek-"+today()+".json";a.click();$("#pmsg").textContent="Yedek dosyası indirildi.";};
+  $("#rs").onclick=()=>$("#fi").click();
+  $("#fi").onchange=e=>{const f=e.target.files[0];if(!f)return;f.text().then(x=>{const o=JSON.parse(x);if(typeof o.right!=="number")throw 0;st=Object.assign(st,o);save();renderProg();renderStats();$("#pmsg").textContent="Yedek yüklendi.";}).catch(()=>{$("#pmsg").textContent="Bu dosya bir Sûre Hafızası yedeği değil.";});};
+  let armed=false;$("#clr").onclick=e=>{if(!armed){armed=true;e.target.textContent="Emin misiniz? Tekrar dokunun";setTimeout(()=>{armed=false;if(e.target.isConnected)e.target.textContent="Sıfırla";},4000);return;}
+    st={right:0,wrong:0,streak:0,best:0,miss:{},mode:st.mode,range:st.range,days:{},pm:{},first:null,last:null};save();renderProg();renderStats();};
+  renderStats();
+}
 $("#search").addEventListener("input",renderList);
-renderQuiz();
+$("#range").value=st.range||"1-114";if(!$("#range").value){$("#range").value="1-114";range=[1,114];}
+setMode(["mix",...MODES,"liste"].includes(mode)?mode:"mix");
 /* Kurulabilir uygulama: çevrimdışı çalışma ve "Yükle" düğmesi */
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 let deferredPrompt=null;
