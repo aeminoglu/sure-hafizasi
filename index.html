@@ -1,0 +1,246 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Sûre Hafızası</title>
+<meta name="theme-color" content="#f6f4ee" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161f" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="fonts.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sûre Hafızası">
+<style>
+/* Layout: tek sütun, telefon ölçüsünde kart; üstte mod sekmeleri, ortada soru, altta seçenekler. Mushaf kâğıdı + lâcivert mürekkep + tezhip altını */
+:root{
+  --paper:#f6f4ee; --card:#fffdf8; --ink:#1d2a44; --muted:#5e6577; --line:#dcd8cc;
+  --lapis:#2747a0; --lapis-soft:#e4e9f7; --gold:#a8781c; --gold-soft:#f5ead3;
+  --ok:#1f7a4d; --ok-soft:#dcf0e4; --bad:#b03a2e; --bad-soft:#f7e1de;
+  --f-ar:"Amiri","Noto Naskh Arabic","Scheherazade New","Traditional Arabic",serif;
+  --f-disp:"Literata",Georgia,serif;
+  --f-ui:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12161f; --card:#1a2030; --ink:#e8e4d8; --muted:#a3a8b6; --line:#2d3446;
+  --lapis:#8fa8ec; --lapis-soft:#25305a; --gold:#d8aa52; --gold-soft:#3a3020;
+  --ok:#6fcf9c; --ok-soft:#173a2a; --bad:#ec8a7e; --bad-soft:#41211e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12161f; --card:#1a2030; --ink:#e8e4d8; --muted:#a3a8b6; --line:#2d3446;
+  --lapis:#8fa8ec; --lapis-soft:#25305a; --gold:#d8aa52; --gold-soft:#3a3020;
+  --ok:#6fcf9c; --ok-soft:#173a2a; --bad:#ec8a7e; --bad-soft:#41211e; color-scheme:dark}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-ui);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain;-webkit-text-size-adjust:100%;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 96px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
+h1{font-family:var(--f-disp);font-weight:700;font-size:1.45rem;margin:0;letter-spacing:-.01em}
+h1 span{font-family:var(--f-ar);color:var(--gold);font-weight:700;margin-inline-start:6px}
+.stats{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+nav.tabs{display:flex;flex-wrap:wrap;gap:6px}
+nav.tabs button{flex:1 1 auto;min-height:40px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font:500 .88rem var(--f-ui);padding:6px 10px;border-radius:999px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--lapis);color:var(--card)}
+.filter{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.filter{flex-wrap:wrap}
+.filter select{flex:1 1 200px;min-height:42px;font:500 1rem var(--f-ui);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px 16px;display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 1px 0 var(--line)}
+.kind{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.prompt{font-family:var(--f-disp);font-size:1.18rem;font-weight:500;text-wrap:balance;margin:0}
+.big{font-family:var(--f-ar);font-size:clamp(2.4rem,12vw,3.1rem);line-height:1.35;text-align:center;color:var(--lapis);direction:rtl}
+.bignum{font-family:var(--f-disp);font-size:clamp(2.6rem,13vw,3.4rem);text-align:center;color:var(--lapis);font-variant-numeric:tabular-nums;line-height:1.1}
+.sub{text-align:center;color:var(--muted);font-size:.95rem;margin-top:-8px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{min-height:76px;min-width:0;border:1.5px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none;background:var(--paper);color:var(--ink);border-radius:12px;
+  font:500 1rem var(--f-ui);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+.opt .ar{font-family:var(--f-ar);font-size:1.5rem;line-height:1.2;direction:rtl}
+.opt .tr{font-size:.85rem;color:var(--muted)}
+.opt.num{font-family:var(--f-disp);font-size:1.6rem;font-variant-numeric:tabular-nums}
+@media (hover:hover){.opt:hover:not(:disabled){border-color:var(--lapis)}}
+.opt:active:not(:disabled){transform:scale(.98);border-color:var(--lapis)}
+.opt:focus-visible,nav.tabs button:focus-visible,.next:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.right .tr{color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.feedback{border-radius:12px;padding:12px 14px;background:var(--gold-soft);font-size:.92rem;display:flex;flex-direction:column;gap:4px}
+.feedback .title{font-weight:600}
+.feedback .ar{font-family:var(--f-ar);font-size:1.45rem;line-height:1.3}
+.feedback{scroll-margin-bottom:96px}
+.feedback .fbhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.nextbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--paper);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.next{display:block;width:100%;max-width:520px;margin:0 auto;min-height:56px;border:0;border-radius:14px;background:var(--lapis);color:var(--card);font:600 1.05rem var(--f-ui);padding:14px;cursor:pointer;touch-action:manipulation}
+.weak{font-size:.85rem;color:var(--muted)}
+.install{align-self:flex-start;border:1px solid var(--gold);background:var(--gold-soft);color:var(--ink);font:600 .9rem var(--f-ui);padding:9px 14px;border-radius:999px;cursor:pointer;min-height:42px}
+.weak b{color:var(--ink);font-weight:600}
+/* Liste */
+.list{display:flex;flex-direction:column;gap:6px}
+.search{font:400 1rem var(--f-ui);min-height:46px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.row .no{font-family:var(--f-disp);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;text-align:center}
+.row .mid{min-width:0}
+.row .nm{font-weight:600}
+.row .mn{font-size:.82rem;color:var(--muted)}
+.row .rt{text-align:end;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.row .rar{font-family:var(--f-ar);font-size:1.3rem;line-height:1.1;color:var(--lapis)}
+.pill{font-size:.72rem;padding:2px 7px;border-radius:999px;background:var(--lapis-soft);color:var(--lapis);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.d{background:var(--gold-soft);color:var(--gold)}
+.note{font-size:.78rem;color:var(--muted)}
+@media (prefers-reduced-motion:no-preference){.opt{transition:background .15s,border-color .15s,transform .08s}}
+/* Yatay tutuş: başlık küçülür, seçenekler dört sütun */
+@media (orientation:landscape) and (max-height:500px){
+  body{padding-block:8px 84px}
+  .wrap{max-width:760px;gap:10px}
+  .card{padding:14px 16px;gap:10px}
+  .big{font-size:2.2rem}.bignum{font-size:2.3rem}
+  .opts{grid-template-columns:repeat(4,1fr)}.opts.two{grid-template-columns:1fr 1fr}
+  .opt{min-height:60px}
+  .next{max-width:760px}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Sûre Hafızası<span>السور</span></h1>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <nav class="tabs" id="tabs" aria-label="Çalışma türü">
+    <button data-mode="mix" aria-pressed="true">Karışık</button>
+    <button data-mode="ad">Sûre adı</button>
+    <button data-mode="sira">Kaçıncı</button>
+    <button data-mode="ayet">Âyet sayısı</button>
+    <button data-mode="anlam">Ad anlamı</button>
+    <button data-mode="yer">Mekkî/Medenî</button>
+    <button data-mode="liste">Liste</button>
+  </nav>
+
+  <div class="filter" id="filterBox">
+    <label for="range">Aralık</label>
+    <select id="range">
+      <option value="1-114">Bütün sûreler (1–114)</option>
+      <option value="78-114">Amme cüzü (78–114)</option>
+      <option value="93-114">Kısa sûreler (93–114)</option>
+      <option value="50-77">Mufassal ortası (50–77)</option>
+      <option value="1-49">Uzun ve orta sûreler (1–49)</option>
+    </select>
+  </div>
+
+  <section class="card" id="quiz" aria-live="polite"></section>
+  <div class="weak" id="weak"></div>
+  <button class="install" id="install" hidden>Uygulamayı telefona yükle</button>
+
+  <section id="listView" hidden>
+    <div class="list">
+      <input class="search" id="search" type="search" placeholder="Sûre adı, numarası veya anlamı ara" aria-label="Sûre ara">
+      <div class="note">Âyet sayıları Kûfe sayımına, Mekkî/Medenî ve nüzûl sırası Kahire Mushafı'na göredir.</div>
+      <div class="list" id="rows"></div>
+    </div>
+  </section>
+</div>
+
+<script>
+const D=[[1,"الفاتحة","Fâtiha","Açılış",7,"M",5],[2,"البقرة","Bakara","İnek",286,"D",87],[3,"آل عمران","Âl-i İmrân","İmrân Ailesi",200,"D",89],[4,"النساء","Nisâ","Kadınlar",176,"D",92],[5,"المائدة","Mâide","Sofra",120,"D",112],[6,"الأنعام","En'âm","Hayvanlar",165,"M",55],[7,"الأعراف","A'râf","Yüksek Yerler",206,"M",39],[8,"الأنفال","Enfâl","Ganimetler",75,"D",88],[9,"التوبة","Tevbe","Tövbe",129,"D",113],[10,"يونس","Yûnus","Yûnus Peygamber",109,"M",51],[11,"هود","Hûd","Hûd Peygamber",123,"M",52],[12,"يوسف","Yûsuf","Yûsuf Peygamber",111,"M",53],[13,"الرعد","Ra'd","Gök Gürültüsü",43,"D",96],[14,"إبراهيم","İbrâhîm","İbrâhim Peygamber",52,"M",72],[15,"الحجر","Hicr","Semûd'un Yurdu",99,"M",54],[16,"النحل","Nahl","Bal Arısı",128,"M",70],[17,"الإسراء","İsrâ","Gece Yolculuğu",111,"M",50],[18,"الكهف","Kehf","Mağara",110,"M",69],[19,"مريم","Meryem","Hz. Meryem",98,"M",44],[20,"طه","Tâhâ","Tâ Hâ harfleri",135,"M",45],[21,"الأنبياء","Enbiyâ","Peygamberler",112,"M",73],[22,"الحج","Hac","Hac İbadeti",78,"D",103],[23,"المؤمنون","Mü'minûn","Müminler",118,"M",74],[24,"النور","Nûr","Işık",64,"D",102],[25,"الفرقان","Furkân","Hakkı Bâtıldan Ayıran",77,"M",42],[26,"الشعراء","Şuarâ","Şairler",227,"M",47],[27,"النمل","Neml","Karıncalar",93,"M",48],[28,"القصص","Kasas","Kıssalar",88,"M",49],[29,"العنكبوت","Ankebût","Örümcek",69,"M",85],[30,"الروم","Rûm","Rumlar (Bizans)",60,"M",84],[31,"لقمان","Lokmân","Lokmân Hakîm",34,"M",57],[32,"السجدة","Secde","Secde",30,"M",75],[33,"الأحزاب","Ahzâb","Gruplar (Hendek)",73,"D",90],[34,"سبأ","Sebe'","Sebe' Halkı",54,"M",58],[35,"فاطر","Fâtır","Yoktan Yaratan",45,"M",43],[36,"يس","Yâsîn","Yâ Sîn harfleri",83,"M",41],[37,"الصافات","Sâffât","Saf Saf Duranlar",182,"M",56],[38,"ص","Sâd","Sâd harfi",88,"M",38],[39,"الزمر","Zümer","Zümreler",75,"M",59],[40,"غافر","Mü'min (Gâfir)","Bağışlayan",85,"M",60],[41,"فصلت","Fussilet","Açıklanmış",54,"M",61],[42,"الشورى","Şûrâ","Danışma",53,"M",62],[43,"الزخرف","Zuhruf","Altın Süs",89,"M",63],[44,"الدخان","Duhân","Duman",59,"M",64],[45,"الجاثية","Câsiye","Diz Çöken",37,"M",65],[46,"الأحقاف","Ahkâf","Kum Tepeleri",35,"M",66],[47,"محمد","Muhammed","Hz. Muhammed",38,"D",95],[48,"الفتح","Fetih","Zafer",29,"D",111],[49,"الحجرات","Hucurât","Odalar",18,"D",106],[50,"ق","Kâf","Kâf harfi",45,"M",34],[51,"الذاريات","Zâriyât","Savurup Dağıtanlar",60,"M",67],[52,"الطور","Tûr","Tûr Dağı",49,"M",76],[53,"النجم","Necm","Yıldız",62,"M",23],[54,"القمر","Kamer","Ay",55,"M",37],[55,"الرحمن","Rahmân","Rahmân",78,"D",97],[56,"الواقعة","Vâkıa","Kesin Olay",96,"M",46],[57,"الحديد","Hadîd","Demir",29,"D",94],[58,"المجادلة","Mücâdele","Tartışan Kadın",22,"D",105],[59,"الحشر","Haşr","Sürgün",24,"D",101],[60,"الممتحنة","Mümtehine","İmtihan Edilen Kadın",13,"D",91],[61,"الصف","Saf","Saf",14,"D",109],[62,"الجمعة","Cuma","Cuma",11,"D",110],[63,"المنافقون","Münâfikûn","Münafıklar",11,"D",104],[64,"التغابن","Teğâbün","Aldanış",18,"D",108],[65,"الطلاق","Talâk","Boşanma",12,"D",99],[66,"التحريم","Tahrîm","Haram Kılma",12,"D",107],[67,"الملك","Mülk","Hükümranlık",30,"M",77],[68,"القلم","Kalem","Kalem",52,"M",2],[69,"الحاقة","Hâkka","Gerçekleşecek Olan",52,"M",78],[70,"المعارج","Meâric","Yükseliş Yolları",44,"M",79],[71,"نوح","Nûh","Nûh Peygamber",28,"M",71],[72,"الجن","Cin","Cinler",28,"M",40],[73,"المزمل","Müzzemmil","Örtünüp Bürünen",20,"M",3],[74,"المدثر","Müddessir","Örtüsüne Sarınan",56,"M",4],[75,"القيامة","Kıyâme","Kıyamet",40,"M",31],[76,"الإنسان","İnsân","İnsan",31,"D",98],[77,"المرسلات","Mürselât","Gönderilenler",50,"M",33],[78,"النبأ","Nebe'","Haber",40,"M",80],[79,"النازعات","Nâziât","Söküp Çıkaranlar",46,"M",81],[80,"عبس","Abese","Yüzünü Ekşitti",42,"M",24],[81,"التكوير","Tekvîr","Dürülme",29,"M",7],[82,"الانفطار","İnfitâr","Yarılma",19,"M",82],[83,"المطففين","Mutaffifîn","Ölçüde Hile Yapanlar",36,"M",86],[84,"الانشقاق","İnşikâk","Yarılıp Çatlama",25,"M",83],[85,"البروج","Bürûc","Burçlar",22,"M",27],[86,"الطارق","Târık","Gece Gelen",17,"M",36],[87,"الأعلى","A'lâ","En Yüce",19,"M",8],[88,"الغاشية","Ğâşiye","Kuşatan",26,"M",68],[89,"الفجر","Fecr","Tan Vakti",30,"M",10],[90,"البلد","Beled","Şehir",20,"M",35],[91,"الشمس","Şems","Güneş",15,"M",26],[92,"الليل","Leyl","Gece",21,"M",9],[93,"الضحى","Duhâ","Kuşluk Vakti",11,"M",11],[94,"الشرح","İnşirâh","Göğsün Açılması",8,"M",12],[95,"التين","Tîn","İncir",8,"M",28],[96,"العلق","Alak","Aşılanmış Yumurta",19,"M",1],[97,"القدر","Kadir","Değer, Kadir Gecesi",5,"M",25],[98,"البينة","Beyyine","Apaçık Delil",8,"D",100],[99,"الزلزلة","Zilzâl","Deprem",8,"D",93],[100,"العاديات","Âdiyât","Koşan Atlar",11,"M",14],[101,"القارعة","Kâria","Kapıyı Çarpan",11,"M",30],[102,"التكاثر","Tekâsür","Çoklukla Övünme",8,"M",16],[103,"العصر","Asr","Zaman, İkindi",3,"M",13],[104,"الهمزة","Hümeze","Arkadan Çekiştiren",9,"M",32],[105,"الفيل","Fîl","Fil",5,"M",19],[106,"قريش","Kureyş","Kureyş Kabilesi",4,"M",29],[107,"الماعون","Mâûn","Yardımlaşma",7,"M",17],[108,"الكوثر","Kevser","Bol Nimet",3,"M",15],[109,"الكافرون","Kâfirûn","Kâfirler",6,"M",18],[110,"النصر","Nasr","İlâhî Yardım",3,"D",114],[111,"المسد","Tebbet (Mesed)","Hurma Lifi",5,"M",6],[112,"الإخلاص","İhlâs","Samimiyet, Tevhid",4,"M",22],[113,"الفلق","Felak","Sabah Aydınlığı",5,"M",20],[114,"الناس","Nâs","İnsanlar",6,"M",21]].map(r=>({no:r[0],ar:r[1],tr:r[2],mn:r[3],ay:r[4],yer:r[5],nz:r[6]}));
+const KEY="sure-hafizasi-v1";
+let st={right:0,wrong:0,streak:0,miss:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)st=Object.assign(st,s);}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}};
+let mode="mix", range=[1,114], cur=null, answered=false;
+const $=s=>document.querySelector(s);
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const pool=()=>D.filter(s=>s.no>=range[0]&&s.no<=range[1]);
+const yerTxt=y=>y==="M"?"Mekkî":"Medenî";
+const MODES=["ad","sira","ayet","anlam","yer"];
+const LABEL={ad:"Sûre adı",sira:"Kaçıncı sûre",ayet:"Âyet sayısı",anlam:"Ad anlamı",yer:"Mekkî / Medenî"};
+
+function pick(m){
+  const p=pool();
+  const w=p.map(s=>1+3*(st.miss[m+":"+s.no]||0));
+  let r=Math.random()*w.reduce((a,b)=>a+b,0);
+  for(let i=0;i<p.length;i++){r-=w[i];if(r<=0)return p[i];}
+  return p[p.length-1];
+}
+function near(s,field,n){
+  const all=D.filter(x=>x.no!==s.no);
+  const sorted=all.sort((a,b)=>Math.abs(a[field]-s[field])-Math.abs(b[field]-s[field]));
+  const out=[],seen=new Set([s[field]]);
+  for(const x of sorted){if(!seen.has(x[field])){seen.add(x[field]);out.push(x);}if(out.length>=n*3)break;}
+  return shuffle(out).slice(0,n);
+}
+function neighbors(s,n){
+  const c=D.filter(x=>x.no!==s.no).sort((a,b)=>Math.abs(a.no-s.no)-Math.abs(b.no-s.no)).slice(0,8);
+  return shuffle(c).slice(0,n);
+}
+function build(){
+  const m=mode==="mix"?MODES[Math.floor(Math.random()*MODES.length)]:mode;
+  const s=pick(m);
+  let q={m,s};
+  if(m==="ad"){q.kind="Sûre adı";q.prompt="Bu sırada hangi sûre var?";q.head=`<div class="bignum">${s.no}.</div><div class="sub">${s.ay} âyet · ${yerTxt(s.yer)}</div>`;
+    q.opts=shuffle([s,...neighbors(s,3)]).map(x=>({ok:x.no===s.no,html:`<span class="ar">${x.ar}</span><span class="tr">${x.tr}</span>`}));}
+  if(m==="sira"){q.kind="Kaçıncı sûre";q.prompt="Bu sûre Mushaf'ta kaçıncı sıradadır?";q.head=`<div class="big">${s.ar}</div><div class="sub">${s.tr}</div>`;
+    q.opts=shuffle([s,...neighbors(s,3)]).map(x=>({ok:x.no===s.no,num:true,html:String(x.no)}));}
+  if(m==="ayet"){q.kind="Âyet sayısı";q.prompt="Bu sûre kaç âyettir?";q.head=`<div class="big">${s.ar}</div><div class="sub">${s.no}. sûre · ${s.tr}</div>`;
+    q.opts=shuffle([s,...near(s,"ay",3)]).map(x=>({ok:x.ay===s.ay,num:true,html:String(x.ay)}));}
+  if(m==="anlam"){q.kind="Ad anlamı";q.prompt="Sûrenin adı ne anlama gelir?";q.head=`<div class="big">${s.ar}</div><div class="sub">${s.no}. sûre · ${s.tr}</div>`;
+    const others=shuffle(D.filter(x=>x.mn!==s.mn&&!/harf/.test(x.mn))).slice(0,3);
+    q.opts=shuffle([s,...others]).map(x=>({ok:x.mn===s.mn,html:x.mn}));}
+  if(m==="yer"){q.kind="Mekkî / Medenî";q.prompt="Bu sûre nerede indi?";q.head=`<div class="big">${s.ar}</div><div class="sub">${s.no}. sûre · ${s.tr}</div>`;
+    q.opts=[{ok:s.yer==="M",html:"Mekkî"},{ok:s.yer==="D",html:"Medenî"}];}
+  return q;
+}
+function renderQuiz(){
+  cur=build();answered=false;const q=cur;
+  const cls=q.opts.length===2?"opts two":"opts";
+  $("#quiz").innerHTML=`<div class="kind">${q.kind}</div><p class="prompt">${q.prompt}</p>${q.head}
+   <div class="${cls}">${q.opts.map((o,i)=>`<button class="opt${o.num?" num":""}" id="o${i}" data-i="${i}">${o.html}</button>`).join("")}</div>
+   <div id="fb"></div>`;
+  $("#quiz").querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>answer(+b.dataset.i)));
+  renderStats();
+}
+function answer(i){
+  if(answered)return;answered=true;
+  const q=cur,s=q.s,k=q.m+":"+s.no,ok=q.opts[i].ok;
+  q.opts.forEach((o,j)=>{const b=$("#o"+j);b.disabled=true;if(o.ok)b.classList.add("right");else if(j===i)b.classList.add("wrong");});
+  if(ok){st.right++;st.streak++;if(st.miss[k]){st.miss[k]--;if(!st.miss[k])delete st.miss[k];}}
+  else{st.wrong++;st.streak=0;st.miss[k]=Math.min((st.miss[k]||0)+1,5);}
+  save();
+  $("#fb").outerHTML=`<div class="feedback"><div class="fbhead"><span class="title">${ok?"Doğru.":"Doğrusu işaretlendi."}</span><bdi class="ar" dir="rtl">${s.ar}</bdi></div>
+    <span>${s.no}. sûre, ${s.tr} (“${s.mn}”), ${s.ay} âyet, ${yerTxt(s.yer)}, nüzûl sırası ${s.nz}.</span></div>
+    <div class="nextbar"><button class="next" id="next">Sonraki soru</button></div>`;
+  if(!ok){try{navigator.vibrate&&navigator.vibrate(70);}catch(e){}}
+  $("#next").addEventListener("click",()=>{renderQuiz();window.scrollTo({top:0,behavior:"smooth"});});
+  $(".feedback").scrollIntoView({block:"nearest",behavior:"smooth"});
+  renderStats();
+}
+function renderStats(){
+  const t=st.right+st.wrong,p=t?Math.round(100*st.right/t):0;
+  $("#stats").innerHTML=`<b>${st.right}</b> doğru · <b>${st.wrong}</b> yanlış · %${p} · seri <b>${st.streak}</b>`;
+  const ks=Object.entries(st.miss).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  $("#weak").innerHTML=ks.length?"Tekrar sıklaştırılanlar: "+ks.map(([k])=>{const [m,n]=k.split(":");const s=D[n-1];return `<b>${s.tr}</b> (${LABEL[m].toLowerCase()})`;}).join(", "):"Yanlış cevaplanan sûreler sonraki sorularda daha sık gelir.";
+}
+function renderList(){
+  const q=$("#search").value.trim().toLocaleLowerCase("tr");
+  const f=D.filter(s=>!q||String(s.no)===q||s.tr.toLocaleLowerCase("tr").includes(q)||s.mn.toLocaleLowerCase("tr").includes(q)||s.ar.includes(q));
+  $("#rows").innerHTML=f.map(s=>`<div class="row"><div class="no">${s.no}</div><div class="mid"><div class="nm">${s.tr}</div><div class="mn">${s.mn} · nüzûl ${s.nz}</div></div>
+   <div class="rt"><span class="rar">${s.ar}</span><span><span class="pill">${s.ay} âyet</span> <span class="pill${s.yer==="D"?" d":""}">${yerTxt(s.yer)}</span></span></div></div>`).join("")||`<div class="note">Eşleşen sûre yok. Aramayı kısaltmayı deneyin.</div>`;
+}
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+  mode=b.dataset.mode;document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  const list=mode==="liste";$("#listView").hidden=!list;$("#quiz").hidden=list;$("#weak").hidden=list;$("#filterBox").hidden=list;
+  if(list)renderList();else renderQuiz();});
+$("#range").addEventListener("change",e=>{range=e.target.value.split("-").map(Number);renderQuiz();});
+$("#search").addEventListener("input",renderList);
+renderQuiz();
+/* Kurulabilir uygulama: çevrimdışı çalışma ve "Yükle" düğmesi */
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPrompt=e;$("#install").hidden=false;});
+$("#install").addEventListener("click",async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();try{await deferredPrompt.userChoice;}catch(e){}deferredPrompt=null;$("#install").hidden=true;});
+window.addEventListener("appinstalled",()=>{$("#install").hidden=true;});
+</script>
+
+</body></html>

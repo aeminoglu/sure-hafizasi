@@ -1,0 +1,18 @@
+SÛRE HAFIZASI - KURULABİLİR UYGULAMA
+
+Bu klasör internete yüklendiğinde telefona uygulama olarak kurulur.
+Klasörü bilgisayardan dosya olarak açmak yeterli değildir, bir web adresinde yayımlanması gerekir.
+
+1) Ücretsiz yayımlama (GitHub Pages)
+   - github.com'da hesap açın, "New repository" ile "sure-hafizasi" adında herkese açık bir depo oluşturun.
+   - "Add file > Upload files" ile bu klasörün İÇİNDEKİ bütün dosya ve klasörleri yükleyin (index.html en üstte olmalı).
+   - Settings > Pages > Branch: main / (root) > Save.
+   - Birkaç dakika sonra adres: https://KULLANICIADI.github.io/sure-hafizasi/
+
+2) Telefona kurulum (Samsung Galaxy S24)
+   - Adresi Chrome'da açın, sayfadaki "Uygulamayı telefona yükle" düğmesine ya da menüden "Ana ekrana ekle / Uygulamayı yükle"ye dokunun.
+   - Samsung Internet'te: menü > "Sayfayı ekle" > "Ana ekran".
+   - Uygulama ana ekranda simgesiyle durur, tam ekran açılır, ilk açılıştan sonra internetsiz de çalışır.
+
+3) İsteğe bağlı: APK dosyası
+   - Yayımlanan adresi pwabuilder.com'a yazın, "Package for stores > Android" ile APK indirip telefona kurabilirsiniz.
