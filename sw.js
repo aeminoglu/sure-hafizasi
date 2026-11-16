@@ -1,6 +1,6 @@
 /* Çevrimdışı çalışma: uygulama dosyaları ilk açılışta önbelleğe alınır, sonra internetsiz açılır. */
-const CACHE="sure-hafizasi-v6";
-const FILES=["./","index.html","kelime.html","irab.html","fonts.css","manifest.webmanifest","icons/icon-48.png","icons/icon-72.png","icons/icon-96.png","icons/icon-144.png","icons/icon-192.png","icons/icon-256.png","icons/icon-384.png","icons/icon-512.png","icons/maskable-512.png",
+const CACHE="sure-hafizasi-v7";
+const FILES=["./","index.html","kelime.html","irab.html","evrad.html","fonts.css","manifest.webmanifest","icons/icon-48.png","icons/icon-72.png","icons/icon-96.png","icons/icon-144.png","icons/icon-192.png","icons/icon-256.png","icons/icon-384.png","icons/icon-512.png","icons/maskable-512.png",
 "fonts/amiri-arabic-400-normal.woff2","fonts/amiri-arabic-700-normal.woff2",
 "fonts/figtree-latin-400-normal.woff2","fonts/figtree-latin-500-normal.woff2","fonts/figtree-latin-600-normal.woff2",
 "fonts/figtree-latin-ext-400-normal.woff2","fonts/figtree-latin-ext-500-normal.woff2","fonts/figtree-latin-ext-600-normal.woff2",
