@@ -146,6 +146,9 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 .pulse{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:6px;animation:bl 1.2s infinite}
 .bignum small{color:var(--muted)}
 .next{width:100%}
+
+.kpis.k4{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.kpis.k4 .kpi{padding:8px 4px}.kpis.k4 .kpi b{font-size:1.2rem}
+#rh{display:block}
 .sent2{font-size:1.45rem;line-height:2.05}
 .defn{font-size:1rem;line-height:1.5;background:var(--paper);border-radius:12px;padding:12px 14px;text-align:center}
 .opts.col1{grid-template-columns:1fr}
@@ -324,6 +327,8 @@ async function finish(auto){
   LS.set("sinav-bitti-"+S.oturum,done);LS.del("sinav-durum-"+S.oturum);
   showDone(done);
 }
+const fmt1=n=>String(Math.round(10*n)/10).replace(".",",");
+function statBox(x,title){return `<h3 class="sh">${title}</h3><div class="kpis k4"><div class="kpi"><b>${x.katilimci}</b><span>katılımcı</span></div><div class="kpi"><b>${fmt1(x.ortalama)}</b><span>ortalama</span></div><div class="kpi"><b>${x.enYuksek}</b><span>en yüksek</span></div><div class="kpi"><b>${x.enDusuk}</b><span>en düşük</span></div></div>`;}
 function showDone(r){
   $("#timer").hidden=true;
   $("#top").innerHTML=`${esc(r.ad)} · ${esc(r.numara)}`;
@@ -331,9 +336,15 @@ function showDone(r){
     <div class="bignum">${r.puan}<small style="font-size:1rem"> puan</small></div>
     <div class="ref">${r.dogru} doğru · ${r.yanlis} yanlış · ${r.bos} boş</div>
     <div class="note" style="text-align:center">${r.gonderildi===false?'<b style="color:var(--bad)">Sonuç gönderilemedi.</b> Bu ekranı öğretmeninize gösterin. <button class="btn" id="tekrar">Tekrar gönder</button>':"Sonucunuz öğretmeninize iletildi."}</div></section>
+    <div id="sinif"></div>
     <h3 class="sh">Cevap anahtarı</h3>
     <div class="list" id="key">${!S||S.acik&&S.oturum===r.oturum&&now()<S.bit?'<div class="note">Cevap anahtarı, sınav herkes için kapanınca burada görünecek.</div>':(r.detay||[]).map((x,i)=>`<div class="wrow col${x.ok?" ok":""}">${x.s.startsWith("<")?x.s:`<div class="ayah sent">${x.s}</div>`}<div class="m">${i+1}. ${esc(x.soru)}<small>Doğru: <b ${x.ar?'dir="rtl" class="arw"':""}>${x.dogru}</b>${x.ok?"":" · Sizin cevabınız: "+(x.ver===null?"boş":`<span ${x.ar?'dir="rtl" class="arw"':""}>${x.ver}</span>`)}</small></div></div>`).join("")}</div>`;
   if(S&&S.acik&&S.oturum===r.oturum&&now()<S.bit){clearInterval(poll);poll=setInterval(async()=>{try{const d=await get({a:"durum"});if(d.oturum!==r.oturum||!d.acik){S=d;clearInterval(poll);showDone(r);}}catch(e){}},5000);}
+  if(!(S&&S.acik&&S.oturum===r.oturum&&now()<S.bit)){
+    $("#sinif").innerHTML='<div class="note">Sınıfın sonuçları hesaplanıyor…</div>';
+    const yukle=async(k)=>{try{const x=await get({a:"istatistik",oturum:r.oturum});if(x.bekle||x.katilimci===undefined){if(k<6)setTimeout(()=>yukle(k+1),5000);return;}
+      if(!$("#sinif"))return;$("#sinif").innerHTML=x.katilimci?statBox(x,"Sınıfın sonuçları"):"";}catch(e){if(k<6)setTimeout(()=>yukle(k+1),5000);}};
+    setTimeout(()=>yukle(0),2500);}
   const t=$("#tekrar");if(t)t.onclick=async()=>{t.disabled=true;try{const q=await post(Object.assign({a:"gonder"},r,{detay:undefined}));if(q.ok){r.gonderildi=true;LS.set("sinav-bitti-"+r.oturum,r);showDone(r);}else t.disabled=false;}catch(e){t.disabled=false;}};
 }
 
@@ -352,7 +363,7 @@ function teacher(){
 function panel(r){
   const lastKonu=LS.get("sinav-ayar",{konu:0,n:20,sure:5});
   $("#top").innerHTML=`Öğretmen paneli · <a class="applink" href="#" id="cik">çıkış</a>`;
-  $("#app").innerHTML=`<section class="card" id="ctl"></section><h3 class="sh" id="rh"></h3><div id="res"></div>
+  $("#app").innerHTML=`<section class="card" id="ctl"></section><div id="rh" class="sh"></div><div id="res"></div>
     <div class="row2"><button class="btn" id="csv">Excel'e aktar (CSV)</button><a class="btn" href="#" id="ogr" style="text-align:center;text-decoration:none">Öğrenci ekranı</a></div>`;
   $("#cik").onclick=e=>{e.preventDefault();sessionStorage.removeItem("sinav-pin");clearInterval(rpoll);location.hash="";};
   const ctl=()=>{
@@ -368,10 +379,11 @@ function panel(r){
         const x=await post(Object.assign({a:"baslat",pin:PIN},a));if(x.hata){alert("Başlatılamadı");e.target.disabled=false;return;}r=Object.assign(x,{sonuclar:[]});ctl();res();};}
   };
   const res=()=>{const L=(r.sonuclar||[]).slice().sort((a,b)=>b.puan-a.puan||a.sn-b.sn);
-    const ort=L.length?Math.round(L.reduce((s,x)=>s+Number(x.puan),0)/L.length):0;
-    $("#rh").innerHTML=r.oturum?`Sonuçlar · oturum ${esc(r.oturum)} · ${L.length} öğrenci${L.length?` · ortalama ${ort}`:""}`:"Henüz sınav yapılmadı";
+    const P=L.filter(x=>x.durum!=="tekrar").map(x=>Number(x.puan)||0);
+    const ist=P.length?{katilimci:P.length,ortalama:P.reduce((a,b)=>a+b,0)/P.length,enYuksek:Math.max(...P),enDusuk:Math.min(...P)}:null;
+    $("#rh").innerHTML=r.oturum?(ist?statBox(ist,`Sonuçlar · ${esc(konuAdi(r.konu))} · oturum ${esc(r.oturum)}${r.acik?" · sınav sürüyor":""}`):`<h3 class="sh">Sonuçlar · oturum ${esc(r.oturum)}</h3>`):`<h3 class="sh">Henüz sınav yapılmadı</h3>`;
     $("#res").innerHTML=L.length?`<table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Puan</th><th>D/Y/B</th><th>Süre</th><th>Not</th></tr></thead><tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.ad)}</td><td>${esc(x.no)}</td><td><b>${x.puan}</b></td><td>${x.dogru}/${x.yanlis}/${x.bos}</td><td>${fmt(x.sn*1000)}</td><td>${x.durum!=="zamanında"?esc(x.durum):""}${x.sekme?` sekme:${x.sekme}`:""}</td></tr>`).join("")}</tbody></table>`:`<div class="note">${r.acik?"Gönderen öğrenci olunca burada görünecek.":""}</div>`;
-    $("#csv").onclick=()=>{const rows=[["Sıra","Ad Soyad","Numara","Puan","Doğru","Yanlış","Boş","Süre (sn)","Sekme değiştirme","Durum"],...L.map((x,i)=>[i+1,x.ad,x.no,x.puan,x.dogru,x.yanlis,x.bos,x.sn,x.sekme,x.durum])];
+    $("#csv").onclick=()=>{const rows=[...(ist?[["Katılımcı",ist.katilimci,"Ortalama",fmt1(ist.ortalama),"En yüksek",ist.enYuksek,"En düşük",ist.enDusuk],[]]:[]),["Sıra","Ad Soyad","Numara","Puan","Doğru","Yanlış","Boş","Süre (sn)","Sekme değiştirme","Durum"],...L.map((x,i)=>[i+1,x.ad,x.no,x.puan,x.dogru,x.yanlis,x.bos,x.sn,x.sekme,x.durum])];
       const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\r\n");
       const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=`irab-sinavi-${r.oturum||"sonuc"}.csv`;a.click();};};
   ctl();res();
