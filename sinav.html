@@ -1,0 +1,347 @@
+<!doctype html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>İ'râb Sınavı</title><meta name="theme-color" content="#f6f4ee"><meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="fonts.css">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192" type="image/png">
+<style>[hidden]{display:none!important}*,*::before,*::after{box-sizing:border-box}
+/* Layout: tek sütun, telefon ölçüsünde kart; üstte mod sekmeleri, ortada soru, altta seçenekler. Mushaf kâğıdı + lâcivert mürekkep + tezhip altını */
+:root{
+  --paper:#f6f4ee; --card:#fffdf8; --ink:#1d2a44; --muted:#5e6577; --line:#dcd8cc;
+  --lapis:#2747a0; --lapis-soft:#e4e9f7; --gold:#a8781c; --gold-soft:#f5ead3;
+  --ok:#1f7a4d; --ok-soft:#dcf0e4; --bad:#b03a2e; --bad-soft:#f7e1de;
+  --f-ar:"Amiri","Noto Naskh Arabic","Scheherazade New","Traditional Arabic",serif;
+  --f-disp:"Literata",Georgia,serif;
+  --f-ui:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12161f; --card:#1a2030; --ink:#e8e4d8; --muted:#a3a8b6; --line:#2d3446;
+  --lapis:#8fa8ec; --lapis-soft:#25305a; --gold:#d8aa52; --gold-soft:#3a3020;
+  --ok:#6fcf9c; --ok-soft:#173a2a; --bad:#ec8a7e; --bad-soft:#41211e; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12161f; --card:#1a2030; --ink:#e8e4d8; --muted:#a3a8b6; --line:#2d3446;
+  --lapis:#8fa8ec; --lapis-soft:#25305a; --gold:#d8aa52; --gold-soft:#3a3020;
+  --ok:#6fcf9c; --ok-soft:#173a2a; --bad:#ec8a7e; --bad-soft:#41211e; color-scheme:dark}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-ui);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent;overscroll-behavior-y:contain;-webkit-text-size-adjust:100%;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 96px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:4px 12px;flex-wrap:wrap}
+h1{font-family:var(--f-disp);font-weight:700;font-size:1.45rem;margin:0;letter-spacing:-.01em}
+h1 span{font-family:var(--f-ar);color:var(--gold);font-weight:700;margin-inline-start:6px}
+.stats{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink)}
+nav.tabs{display:flex;flex-wrap:wrap;gap:6px}
+nav.tabs button{flex:1 1 auto;min-height:40px;border:1px solid var(--line);background:transparent;color:var(--ink);
+  font:500 .88rem var(--f-ui);padding:6px 10px;border-radius:999px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--lapis);color:var(--card)}
+.filter{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.filter{flex-wrap:wrap}
+.filter select{flex:1 1 200px;min-height:42px;font:500 1rem var(--f-ui);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 16px 16px;display:flex;flex-direction:column;gap:14px;
+  box-shadow:0 1px 0 var(--line)}
+.kind{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.prompt{font-family:var(--f-disp);font-size:1.18rem;font-weight:500;text-wrap:balance;margin:0}
+.big{font-family:var(--f-ar);font-size:clamp(2.4rem,12vw,3.1rem);line-height:1.35;text-align:center;color:var(--lapis);direction:rtl}
+.bignum{font-family:var(--f-disp);font-size:clamp(2.6rem,13vw,3.4rem);text-align:center;color:var(--lapis);font-variant-numeric:tabular-nums;line-height:1.1}
+.sub{text-align:center;color:var(--muted);font-size:.95rem;margin-top:-8px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{min-height:76px;min-width:0;border:1.5px solid var(--line);touch-action:manipulation;user-select:none;-webkit-user-select:none;background:var(--paper);color:var(--ink);border-radius:12px;
+  font:500 1rem var(--f-ui);padding:10px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center}
+.opt .ar{font-family:var(--f-ar);font-size:1.5rem;line-height:1.2;direction:rtl}
+.opt .tr{font-size:.85rem;color:var(--muted)}
+.opt.num{font-family:var(--f-disp);font-size:1.6rem;font-variant-numeric:tabular-nums}
+@media (hover:hover){.opt:hover:not(:disabled){border-color:var(--lapis)}}
+.opt:active:not(:disabled){transform:scale(.98);border-color:var(--lapis)}
+.opt:focus-visible,nav.tabs button:focus-visible,.next:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.opt.right .tr{color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opt:disabled{cursor:default}
+.feedback{border-radius:12px;padding:12px 14px;background:var(--gold-soft);font-size:.92rem;display:flex;flex-direction:column;gap:4px}
+.feedback .title{font-weight:600}
+.feedback .ar{font-family:var(--f-ar);font-size:1.45rem;line-height:1.3}
+.feedback{scroll-margin-bottom:96px}
+.feedback .fbhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.nextbar{position:fixed;left:0;right:0;bottom:0;z-index:5;background:var(--paper);border-top:1px solid var(--line);
+  padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.next{display:block;width:100%;max-width:520px;margin:0 auto;min-height:56px;border:0;border-radius:14px;background:var(--lapis);color:var(--card);font:600 1.05rem var(--f-ui);padding:14px;cursor:pointer;touch-action:manipulation}
+.weak{font-size:.85rem;color:var(--muted)}
+.install{align-self:flex-start;border:1px solid var(--gold);background:var(--gold-soft);color:var(--ink);font:600 .9rem var(--f-ui);padding:9px 14px;border-radius:999px;cursor:pointer;min-height:42px}
+.weak b{color:var(--ink);font-weight:600}
+/* Liste */
+.list{display:flex;flex-direction:column;gap:6px}
+.search{font:400 1rem var(--f-ui);min-height:46px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+.row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.row .no{font-family:var(--f-disp);font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;text-align:center}
+.row .mid{min-width:0}
+.row .nm{font-weight:600}
+.row .mn{font-size:.82rem;color:var(--muted)}
+.row .rt{text-align:end;display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.row .rar{font-family:var(--f-ar);font-size:1.3rem;line-height:1.1;color:var(--lapis)}
+.pill{font-size:.72rem;padding:2px 7px;border-radius:999px;background:var(--lapis-soft);color:var(--lapis);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill.d{background:var(--gold-soft);color:var(--gold)}
+.note{font-size:.78rem;color:var(--muted)}
+.prog{display:flex;flex-direction:column;gap:14px}
+.prog h3{font:600 1rem var(--f-ui);margin:0 0 6px}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.kpi b{display:block;font-size:1.35rem;color:var(--lapis);font-variant-numeric:tabular-nums}
+.kpi span{font-size:.75rem;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;align-items:end;height:120px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 10px 6px}
+.day{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px;font-size:.7rem;color:var(--muted)}
+.stk{width:70%;height:70%;display:flex;flex-direction:column;justify-content:flex-end}.stk:empty,.stk.z{border-bottom:2px solid var(--line)}
+.bar{width:100%;background:var(--lapis)}
+.bar.w{background:var(--bad);border-radius:0}
+.mrow{display:grid;grid-template-columns:110px 1fr 46px;gap:8px;align-items:center;font-size:.85rem}
+.track{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.fill{height:100%;background:var(--ok)}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 .88rem var(--f-ui);padding:10px 14px;border-radius:999px;min-height:44px;cursor:pointer}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+@media (prefers-reduced-motion:no-preference){.opt{transition:background .15s,border-color .15s,transform .08s}}
+/* Yatay tutuş: başlık küçülür, seçenekler dört sütun */
+@media (orientation:landscape) and (max-height:500px){
+  body{padding-block:8px 84px}
+  .wrap{max-width:760px;gap:10px}
+  .card{padding:14px 16px;gap:10px}
+  .big{font-size:2.2rem}.bignum{font-size:2.3rem}
+  .opts{grid-template-columns:repeat(4,1fr)}.opts.two{grid-template-columns:1fr 1fr}
+  .opt{min-height:60px}
+  .next{max-width:760px}
+}
+.ayah{font-family:var(--f-ar);font-size:1.55rem;line-height:2.1;direction:rtl;text-align:center;color:var(--ink);background:var(--paper);border-radius:12px;padding:10px 12px}
+.ref{text-align:center;color:var(--muted);font-size:.85rem;margin-top:-8px}
+.opt.mean{font-size:.98rem;line-height:1.3}
+.opt .arw{font-family:var(--f-ar);font-size:1.7rem;line-height:1.3;direction:rtl}
+.feedback .ayah{font-size:1.3rem;background:transparent;padding:4px 0;text-align:right}
+.wrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.wrow .m{font-size:.92rem}.wrow .m small{display:block;color:var(--muted);font-size:.76rem}
+.wrow .a{font-family:var(--f-ar);font-size:1.5rem;color:var(--lapis);direction:rtl}
+.wrow.ok{border-color:var(--ok)}
+.sh{font:600 .95rem var(--f-ui);margin:10px 0 2px;color:var(--gold)}
+.applink{font-size:.85rem;color:var(--lapis);text-decoration:none;font-weight:600}
+.sent{font-size:1.75rem;line-height:2}
+.tg{color:var(--lapis);border-bottom:3px solid var(--gold);padding-bottom:2px}
+.wrow.col{grid-template-columns:1fr}
+.wrow.col .sent{font-size:1.4rem;background:transparent;padding:0;text-align:right}
+.opts.two{grid-template-columns:1fr 1fr}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted);margin:0 0 12px;flex:1}
+.fl input,.fl select{font:500 1rem var(--f-ui);color:var(--ink)}
+.fl select{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px;min-height:46px}
+.timer{position:fixed;bottom:16px;right:16px;z-index:20;background:var(--lapis);color:#fff;font:700 1.05rem var(--f-ui);padding:8px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.2);font-variant-numeric:tabular-nums}
+.timer.low{background:var(--bad);animation:bl 1s infinite}
+@keyframes bl{50%{opacity:.6}}
+.opt.sel{border-color:var(--lapis);background:color-mix(in srgb,var(--lapis) 14%,var(--card));color:var(--lapis);font-weight:600}
+.dots{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}
+.dot{width:38px;height:38px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--muted);font:600 .85rem var(--f-ui);cursor:pointer}
+.dot.done{background:var(--lapis);color:#fff;border-color:var(--lapis)}
+.dot.cur{outline:3px solid var(--gold);outline-offset:1px}
+.row2{display:flex;gap:10px;margin:10px 0}.row2>*{flex:1}
+.btn.wide{width:100%;margin-top:6px}
+.btn:disabled{opacity:.45}
+.next:disabled{opacity:.6}
+.tbl{width:100%;border-collapse:collapse;font-size:.88rem;background:var(--card);border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left}
+.tbl th{font-size:.75rem;color:var(--muted);font-weight:600}
+.pulse{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--ok);margin-right:6px;animation:bl 1.2s infinite}
+.bignum small{color:var(--muted)}
+.next{width:100%}
+</style></head><body>
+<div class="wrap">
+  <header>
+    <h1>İ'râb Sınavı<span>اختبار الإعراب</span></h1>
+    <div class="stats" id="top"></div>
+  </header>
+  <main id="app"></main>
+</div>
+<div class="timer" id="timer" hidden></div>
+<script>
+const API="https://script.google.com/macros/s/AKfycbxDSbv4KTviDVBrOeHAYDvv8gdbPnZJmC2I2mU1tlg6Fv30Q2G3fQTE06roNh5wzJ0/exec";
+const DATA={"K": {"1": "İsim cümlesi", "2": "Fiil cümlesi", "3": "Harf-i cer ve izafet", "4": "Sıfat", "5": "Kâne ve kardeşleri", "6": "İnne ve kardeşleri", "7": "Esmâ-i hamse", "8": "Muzâri fiilin i'râbı", "9": "Nâib-i fâil", "10": "Mef'ûller, hâl, temyiz", "11": "Tâbiler, nidâ, istisnâ"}, "Q": [{"k": 1, "pre": "", "tg": "الطَّالِبُ", "post": " مُجْتَهِدٌ", "tr": "Öğrenci çalışkandır.", "role": "mübtedâ", "cs": "R", "al": "damme", "f": ["الطَّالِبُ", "الطَّالِبَ", "الطَّالِبِ"]}, {"k": 1, "pre": "الطَّالِبُ ", "tg": "مُجْتَهِدٌ", "post": "", "tr": "Öğrenci çalışkandır.", "role": "haber", "cs": "R", "al": "damme", "f": ["مُجْتَهِدٌ", "مُجْتَهِدًا", "مُجْتَهِدٍ"]}, {"k": 1, "pre": "", "tg": "الْبَيْتُ", "post": " كَبِيرٌ", "tr": "Ev büyüktür.", "role": "mübtedâ", "cs": "R", "al": "damme", "f": ["الْبَيْتُ", "الْبَيْتَ", "الْبَيْتِ"]}, {"k": 1, "pre": "الْمُعَلِّمَةُ ", "tg": "حَاضِرَةٌ", "post": "", "tr": "Öğretmen hanım hazırdır.", "role": "haber", "cs": "R", "al": "damme", "f": ["حَاضِرَةٌ", "حَاضِرَةً", "حَاضِرَةٍ"]}, {"k": 1, "pre": "", "tg": "الطَّالِبَانِ", "post": " مُجْتَهِدَانِ", "tr": "İki öğrenci çalışkandır.", "role": "mübtedâ", "cs": "R", "al": "elif", "f": ["الطَّالِبَانِ", "الطَّالِبَيْنِ"]}, {"k": 1, "pre": "الطَّالِبَانِ ", "tg": "مُجْتَهِدَانِ", "post": "", "tr": "İki öğrenci çalışkandır.", "role": "haber", "cs": "R", "al": "elif", "f": ["مُجْتَهِدَانِ", "مُجْتَهِدَيْنِ"]}, {"k": 1, "pre": "", "tg": "الْمُعَلِّمُونَ", "post": " حَاضِرُونَ", "tr": "Öğretmenler hazırdır.", "role": "mübtedâ", "cs": "R", "al": "vâv", "f": ["الْمُعَلِّمُونَ", "الْمُعَلِّمِينَ"]}, {"k": 1, "pre": "الْمُعَلِّمُونَ ", "tg": "حَاضِرُونَ", "post": "", "tr": "Öğretmenler hazırdır.", "role": "haber", "cs": "R", "al": "vâv", "f": ["حَاضِرُونَ", "حَاضِرِينَ"]}, {"k": 1, "pre": "", "tg": "الطَّالِبَاتُ", "post": " مُجْتَهِدَاتٌ", "tr": "Kız öğrenciler çalışkandır.", "role": "mübtedâ", "cs": "R", "al": "damme", "f": ["الطَّالِبَاتُ", "الطَّالِبَاتِ", "الطَّالِبَاتَ"]}, {"k": 1, "pre": "الطَّالِبَاتُ ", "tg": "مُجْتَهِدَاتٌ", "post": "", "tr": "Kız öğrenciler çalışkandır.", "role": "haber", "cs": "R", "al": "damme", "f": ["مُجْتَهِدَاتٌ", "مُجْتَهِدَاتٍ", "مُجْتَهِدَاتً"]}, {"k": 1, "pre": "الْكِتَابُ ", "tg": "مُفِيدٌ", "post": "", "tr": "Kitap faydalıdır.", "role": "haber", "cs": "R", "al": "damme", "f": ["مُفِيدٌ", "مُفِيدًا", "مُفِيدٍ"]}, {"k": 1, "pre": "", "tg": "الْعِلْمُ", "post": " نُورٌ", "tr": "İlim nurdur.", "role": "mübtedâ", "cs": "R", "al": "damme", "f": ["الْعِلْمُ", "الْعِلْمَ", "الْعِلْمِ"]}, {"k": 1, "pre": "اللهُ ", "tg": "غَفُورٌ", "post": "", "tr": "Allah çok bağışlayandır.", "role": "haber", "cs": "R", "al": "damme", "f": ["غَفُورٌ", "غَفُورًا", "غَفُورٍ"]}, {"k": 2, "pre": "ذَهَبَ ", "tg": "الطَّالِبُ", "post": " إِلَى الْمَدْرَسَةِ", "tr": "Öğrenci okula gitti.", "role": "fâil", "cs": "R", "al": "damme", "f": ["الطَّالِبُ", "الطَّالِبَ", "الطَّالِبِ"]}, {"k": 2, "pre": "كَتَبَ الطَّالِبُ ", "tg": "الدَّرْسَ", "post": "", "tr": "Öğrenci dersi yazdı.", "role": "mef'ûl bih", "cs": "N", "al": "fetha", "f": ["الدَّرْسَ", "الدَّرْسُ", "الدَّرْسِ"]}, {"k": 2, "pre": "كَتَبَ ", "tg": "الطَّالِبُ", "post": " الدَّرْسَ", "tr": "Öğrenci dersi yazdı.", "role": "fâil", "cs": "R", "al": "damme", "f": ["الطَّالِبُ", "الطَّالِبَ", "الطَّالِبِ"]}, {"k": 2, "pre": "قَرَأَ الْوَلَدُ ", "tg": "كِتَابًا", "post": "", "tr": "Çocuk bir kitap okudu.", "role": "mef'ûl bih", "cs": "N", "al": "fetha", "f": ["كِتَابًا", "كِتَابٌ", "كِتَابٍ"]}, {"k": 2, "pre": "حَضَرَ ", "tg": "الْمُعَلِّمُونَ", "post": "", "tr": "Öğretmenler geldi.", "role": "fâil", "cs": "R", "al": "vâv", "f": ["الْمُعَلِّمُونَ", "الْمُعَلِّمِينَ"]}, {"k": 2, "pre": "رَأَيْتُ ", "tg": "الْمُعَلِّمِينَ", "post": "", "tr": "Öğretmenleri gördüm.", "role": "mef'ûl bih", "cs": "N", "al": "yâ", "f": ["الْمُعَلِّمِينَ", "الْمُعَلِّمُونَ"]}, {"k": 2, "pre": "جَاءَ ", "tg": "الطَّالِبَانِ", "post": "", "tr": "İki öğrenci geldi.", "role": "fâil", "cs": "R", "al": "elif", "f": ["الطَّالِبَانِ", "الطَّالِبَيْنِ"]}, {"k": 2, "pre": "سَأَلَ الْمُعَلِّمُ ", "tg": "الطَّالِبَيْنِ", "post": "", "tr": "Öğretmen iki öğrenciye sordu.", "role": "mef'ûl bih", "cs": "N", "al": "yâ", "f": ["الطَّالِبَيْنِ", "الطَّالِبَانِ"]}, {"k": 2, "pre": "رَأَيْتُ ", "tg": "الطَّالِبَاتِ", "post": "", "tr": "Kız öğrencileri gördüm.", "role": "mef'ûl bih", "cs": "N", "al": "kesre (fetha yerine)", "f": ["الطَّالِبَاتِ", "الطَّالِبَاتُ", "الطَّالِبَاتَ"]}, {"k": 2, "pre": "نَجَحَتِ ", "tg": "الطَّالِبَاتُ", "post": "", "tr": "Kız öğrenciler başardı.", "role": "fâil", "cs": "R", "al": "damme", "f": ["الطَّالِبَاتُ", "الطَّالِبَاتِ", "الطَّالِبَاتَ"]}, {"k": 2, "pre": "شَرِبَ الطِّفْلُ ", "tg": "الْحَلِيبَ", "post": "", "tr": "Çocuk sütü içti.", "role": "mef'ûl bih", "cs": "N", "al": "fetha", "f": ["الْحَلِيبَ", "الْحَلِيبُ", "الْحَلِيبِ"]}, {"k": 2, "pre": "فَتَحَ ", "tg": "الْوَلَدُ", "post": " الْبَابَ", "tr": "Çocuk kapıyı açtı.", "role": "fâil", "cs": "R", "al": "damme", "f": ["الْوَلَدُ", "الْوَلَدَ", "الْوَلَدِ"]}, {"k": 3, "pre": "ذَهَبَ الطَّالِبُ إِلَى ", "tg": "الْمَدْرَسَةِ", "post": "", "tr": "Öğrenci okula gitti.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "kesre", "f": ["الْمَدْرَسَةِ", "الْمَدْرَسَةُ", "الْمَدْرَسَةَ"]}, {"k": 3, "pre": "الْكِتَابُ عَلَى ", "tg": "الْمَكْتَبِ", "post": "", "tr": "Kitap masanın üstündedir.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "kesre", "f": ["الْمَكْتَبِ", "الْمَكْتَبُ", "الْمَكْتَبَ"]}, {"k": 3, "pre": "سَلَّمْتُ عَلَى ", "tg": "الْمُعَلِّمِينَ", "post": "", "tr": "Öğretmenlere selam verdim.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "yâ", "f": ["الْمُعَلِّمِينَ", "الْمُعَلِّمُونَ"]}, {"k": 3, "pre": "مَرَرْتُ ", "tg": "بِالطَّالِبَيْنِ", "post": "", "tr": "İki öğrenciye uğradım.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "yâ", "f": ["بِالطَّالِبَيْنِ", "بِالطَّالِبَانِ"]}, {"k": 3, "pre": "هٰذَا كِتَابُ ", "tg": "الطَّالِبِ", "post": "", "tr": "Bu, öğrencinin kitabıdır.", "role": "muzâfun ileyh", "cs": "C", "al": "kesre", "f": ["الطَّالِبِ", "الطَّالِبُ", "الطَّالِبَ"]}, {"k": 3, "pre": "بَابُ ", "tg": "الْبَيْتِ", "post": " مَفْتُوحٌ", "tr": "Evin kapısı açıktır.", "role": "muzâfun ileyh", "cs": "C", "al": "kesre", "f": ["الْبَيْتِ", "الْبَيْتُ", "الْبَيْتَ"]}, {"k": 3, "pre": "", "tg": "بَابُ", "post": " الْبَيْتِ مَفْتُوحٌ", "tr": "Evin kapısı açıktır.", "role": "mübtedâ", "cs": "R", "al": "damme", "f": ["بَابُ", "بَابَ", "بَابِ"]}, {"k": 3, "pre": "قَرَأْتُ كِتَابَ ", "tg": "الْمُعَلِّمِ", "post": "", "tr": "Öğretmenin kitabını okudum.", "role": "muzâfun ileyh", "cs": "C", "al": "kesre", "f": ["الْمُعَلِّمِ", "الْمُعَلِّمُ", "الْمُعَلِّمَ"]}, {"k": 3, "pre": "قَرَأْتُ ", "tg": "كِتَابَ", "post": " الْمُعَلِّمِ", "tr": "Öğretmenin kitabını okudum.", "role": "mef'ûl bih", "cs": "N", "al": "fetha", "f": ["كِتَابَ", "كِتَابُ", "كِتَابِ"]}, {"k": 3, "pre": "حَقِيبَةُ ", "tg": "الطَّالِبَةِ", "post": " جَدِيدَةٌ", "tr": "Kız öğrencinin çantası yenidir.", "role": "muzâfun ileyh", "cs": "C", "al": "kesre", "f": ["الطَّالِبَةِ", "الطَّالِبَةُ", "الطَّالِبَةَ"]}, {"k": 3, "pre": "هٰؤُلَاءِ مُعَلِّمُو ", "tg": "الْمَدْرَسَةِ", "post": "", "tr": "Bunlar okulun öğretmenleridir.", "role": "muzâfun ileyh", "cs": "C", "al": "kesre", "f": ["الْمَدْرَسَةِ", "الْمَدْرَسَةُ", "الْمَدْرَسَةَ"]}, {"k": 3, "pre": "صَلَّيْتُ فِي ", "tg": "مَسَاجِدَ", "post": " كَثِيرَةٍ", "tr": "Birçok mescitte namaz kıldım.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "fetha (kesre yerine)", "f": ["مَسَاجِدَ", "مَسَاجِدِ", "مَسَاجِدٍ"]}, {"k": 3, "pre": "سَافَرْتُ إِلَى ", "tg": "مَكَّةَ", "post": "", "tr": "Mekke'ye yolculuk ettim.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "fetha (kesre yerine)", "f": ["مَكَّةَ", "مَكَّةِ", "مَكَّةٍ"]}, {"k": 4, "pre": "هٰذَا طَالِبٌ ", "tg": "مُجْتَهِدٌ", "post": "", "tr": "Bu çalışkan bir öğrencidir.", "role": "sıfat", "cs": "R", "al": "damme", "f": ["مُجْتَهِدٌ", "مُجْتَهِدًا", "مُجْتَهِدٍ"]}, {"k": 4, "pre": "قَرَأْتُ كِتَابًا ", "tg": "مُفِيدًا", "post": "", "tr": "Faydalı bir kitap okudum.", "role": "sıfat", "cs": "N", "al": "fetha", "f": ["مُفِيدًا", "مُفِيدٌ", "مُفِيدٍ"]}, {"k": 4, "pre": "سَكَنْتُ فِي بَيْتٍ ", "tg": "كَبِيرٍ", "post": "", "tr": "Büyük bir evde oturdum.", "role": "sıfat", "cs": "C", "al": "kesre", "f": ["كَبِيرٍ", "كَبِيرٌ", "كَبِيرًا"]}, {"k": 4, "pre": "جَاءَ الطَّالِبُ ", "tg": "الْجَدِيدُ", "post": "", "tr": "Yeni öğrenci geldi.", "role": "sıfat", "cs": "R", "al": "damme", "f": ["الْجَدِيدُ", "الْجَدِيدَ", "الْجَدِيدِ"]}, {"k": 4, "pre": "رَأَيْتُ الطَّالِبَ ", "tg": "الْجَدِيدَ", "post": "", "tr": "Yeni öğrenciyi gördüm.", "role": "sıfat", "cs": "N", "al": "fetha", "f": ["الْجَدِيدَ", "الْجَدِيدُ", "الْجَدِيدِ"]}, {"k": 4, "pre": "سَلَّمْتُ عَلَى الْمُعَلِّمِ ", "tg": "الْجَدِيدِ", "post": "", "tr": "Yeni öğretmene selam verdim.", "role": "sıfat", "cs": "C", "al": "kesre", "f": ["الْجَدِيدِ", "الْجَدِيدُ", "الْجَدِيدَ"]}, {"k": 4, "pre": "حَضَرَ الطَّالِبَانِ ", "tg": "الْمُجْتَهِدَانِ", "post": "", "tr": "Çalışkan iki öğrenci geldi.", "role": "sıfat", "cs": "R", "al": "elif", "f": ["الْمُجْتَهِدَانِ", "الْمُجْتَهِدَيْنِ"]}, {"k": 4, "pre": "رَأَيْتُ الْمُعَلِّمِينَ ", "tg": "الصَّالِحِينَ", "post": "", "tr": "Sâlih öğretmenleri gördüm.", "role": "sıfat", "cs": "N", "al": "yâ", "f": ["الصَّالِحِينَ", "الصَّالِحُونَ"]}, {"k": 4, "pre": "فِي الْمَدِينَةِ مَسَاجِدُ ", "tg": "كَثِيرَةٌ", "post": "", "tr": "Şehirde birçok mescit vardır.", "role": "sıfat", "cs": "R", "al": "damme", "f": ["كَثِيرَةٌ", "كَثِيرَةً", "كَثِيرَةٍ"]}, {"k": 4, "pre": "اِشْتَرَيْتُ سَيَّارَةً ", "tg": "جَدِيدَةً", "post": "", "tr": "Yeni bir araba satın aldım.", "role": "sıfat", "cs": "N", "al": "fetha", "f": ["جَدِيدَةً", "جَدِيدَةٌ", "جَدِيدَةٍ"]}, {"k": 5, "pre": "كَانَ ", "tg": "الطَّالِبُ", "post": " مُجْتَهِدًا", "tr": "Öğrenci çalışkandı.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "damme", "f": ["الطَّالِبُ", "الطَّالِبَ", "الطَّالِبِ"]}, {"k": 5, "pre": "كَانَ الطَّالِبُ ", "tg": "مُجْتَهِدًا", "post": "", "tr": "Öğrenci çalışkandı.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "fetha", "f": ["مُجْتَهِدًا", "مُجْتَهِدٌ", "مُجْتَهِدٍ"]}, {"k": 5, "pre": "كَانَ الْجَوُّ ", "tg": "بَارِدًا", "post": "", "tr": "Hava soğuktu.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "fetha", "f": ["بَارِدًا", "بَارِدٌ", "بَارِدٍ"]}, {"k": 5, "pre": "كَانَ ", "tg": "الْمُعَلِّمُونَ", "post": " حَاضِرِينَ", "tr": "Öğretmenler hazırdı.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "vâv", "f": ["الْمُعَلِّمُونَ", "الْمُعَلِّمِينَ"]}, {"k": 5, "pre": "كَانَ الْمُعَلِّمُونَ ", "tg": "حَاضِرِينَ", "post": "", "tr": "Öğretmenler hazırdı.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "yâ", "f": ["حَاضِرِينَ", "حَاضِرُونَ"]}, {"k": 5, "pre": "لَيْسَ ", "tg": "الدَّرْسُ", "post": " صَعْبًا", "tr": "Ders zor değildir.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "damme", "f": ["الدَّرْسُ", "الدَّرْسَ", "الدَّرْسِ"]}, {"k": 5, "pre": "لَيْسَ الدَّرْسُ ", "tg": "صَعْبًا", "post": "", "tr": "Ders zor değildir.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "fetha", "f": ["صَعْبًا", "صَعْبٌ", "صَعْبٍ"]}, {"k": 5, "pre": "صَارَ ", "tg": "الْوَلَدُ", "post": " رَجُلًا", "tr": "Çocuk adam oldu.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "damme", "f": ["الْوَلَدُ", "الْوَلَدَ", "الْوَلَدِ"]}, {"k": 5, "pre": "صَارَ الْوَلَدُ ", "tg": "رَجُلًا", "post": "", "tr": "Çocuk adam oldu.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "fetha", "f": ["رَجُلًا", "رَجُلٌ", "رَجُلٍ"]}, {"k": 5, "pre": "مَا زَالَ الْمَطَرُ ", "tg": "نَازِلًا", "post": "", "tr": "Yağmur hâlâ yağıyor.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "fetha", "f": ["نَازِلًا", "نَازِلٌ", "نَازِلٍ"]}, {"k": 5, "pre": "كَانَ الطَّالِبَانِ ", "tg": "غَائِبَيْنِ", "post": "", "tr": "İki öğrenci yoktu.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "yâ", "f": ["غَائِبَيْنِ", "غَائِبَانِ"]}, {"k": 5, "pre": "أَصْبَحَتِ ", "tg": "الطَّالِبَاتُ", "post": " مُعَلِّمَاتٍ", "tr": "Kız öğrenciler öğretmen oldu.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "damme", "f": ["الطَّالِبَاتُ", "الطَّالِبَاتِ", "الطَّالِبَاتَ"]}, {"k": 5, "pre": "أَصْبَحَتِ الطَّالِبَاتُ ", "tg": "مُعَلِّمَاتٍ", "post": "", "tr": "Kız öğrenciler öğretmen oldu.", "role": "kâne ve kardeşlerinin haberi", "cs": "N", "al": "kesre (fetha yerine)", "f": ["مُعَلِّمَاتٍ", "مُعَلِّمَاتٌ", "مُعَلِّمَاتً"]}, {"k": 6, "pre": "إِنَّ ", "tg": "الطَّالِبَ", "post": " مُجْتَهِدٌ", "tr": "Şüphesiz öğrenci çalışkandır.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["الطَّالِبَ", "الطَّالِبُ", "الطَّالِبِ"]}, {"k": 6, "pre": "إِنَّ الطَّالِبَ ", "tg": "مُجْتَهِدٌ", "post": "", "tr": "Şüphesiz öğrenci çalışkandır.", "role": "inne ve kardeşlerinin haberi", "cs": "R", "al": "damme", "f": ["مُجْتَهِدٌ", "مُجْتَهِدًا", "مُجْتَهِدٍ"]}, {"k": 6, "pre": "إِنَّ ", "tg": "اللهَ", "post": " غَفُورٌ", "tr": "Şüphesiz Allah çok bağışlayandır.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["اللهَ", "اللهُ", "اللهِ"]}, {"k": 6, "pre": "إِنَّ اللهَ ", "tg": "غَفُورٌ", "post": "", "tr": "Şüphesiz Allah çok bağışlayandır.", "role": "inne ve kardeşlerinin haberi", "cs": "R", "al": "damme", "f": ["غَفُورٌ", "غَفُورًا", "غَفُورٍ"]}, {"k": 6, "pre": "لَيْتَ ", "tg": "الشَّبَابَ", "post": " يَعُودُ", "tr": "Keşke gençlik geri dönse.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["الشَّبَابَ", "الشَّبَابُ", "الشَّبَابِ"]}, {"k": 6, "pre": "لَعَلَّ ", "tg": "الْمُسَافِرِينَ", "post": " قَادِمُونَ", "tr": "Umulur ki yolcular geliyordur.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "yâ", "f": ["الْمُسَافِرِينَ", "الْمُسَافِرُونَ"]}, {"k": 6, "pre": "لَعَلَّ الْمُسَافِرِينَ ", "tg": "قَادِمُونَ", "post": "", "tr": "Umulur ki yolcular geliyordur.", "role": "inne ve kardeşlerinin haberi", "cs": "R", "al": "vâv", "f": ["قَادِمُونَ", "قَادِمِينَ"]}, {"k": 6, "pre": "عَلِمْتُ أَنَّ ", "tg": "الِامْتِحَانَ", "post": " قَرِيبٌ", "tr": "Sınavın yakın olduğunu öğrendim.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["الِامْتِحَانَ", "الِامْتِحَانُ", "الِامْتِحَانِ"]}, {"k": 6, "pre": "كَأَنَّ ", "tg": "الْعِلْمَ", "post": " نُورٌ", "tr": "İlim sanki bir nurdur.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["الْعِلْمَ", "الْعِلْمُ", "الْعِلْمِ"]}, {"k": 6, "pre": "إِنَّ ", "tg": "الطَّالِبَيْنِ", "post": " مُجْتَهِدَانِ", "tr": "Şüphesiz iki öğrenci çalışkandır.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "yâ", "f": ["الطَّالِبَيْنِ", "الطَّالِبَانِ"]}, {"k": 6, "pre": "إِنَّ الطَّالِبَيْنِ ", "tg": "مُجْتَهِدَانِ", "post": "", "tr": "Şüphesiz iki öğrenci çalışkandır.", "role": "inne ve kardeşlerinin haberi", "cs": "R", "al": "elif", "f": ["مُجْتَهِدَانِ", "مُجْتَهِدَيْنِ"]}, {"k": 6, "pre": "الْبَيْتُ صَغِيرٌ لٰكِنَّ ", "tg": "الْحَدِيقَةَ", "post": " وَاسِعَةٌ", "tr": "Ev küçük ama bahçe geniştir.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "fetha", "f": ["الْحَدِيقَةَ", "الْحَدِيقَةُ", "الْحَدِيقَةِ"]}, {"k": 7, "pre": "جَاءَ ", "tg": "أَبُوكَ", "post": "", "tr": "Baban geldi.", "role": "fâil", "cs": "R", "al": "vâv", "f": ["أَبُوكَ", "أَبَاكَ", "أَبِيكَ"]}, {"k": 7, "pre": "رَأَيْتُ ", "tg": "أَبَاكَ", "post": "", "tr": "Babanı gördüm.", "role": "mef'ûl bih", "cs": "N", "al": "elif", "f": ["أَبَاكَ", "أَبُوكَ", "أَبِيكَ"]}, {"k": 7, "pre": "سَلَّمْتُ عَلَى ", "tg": "أَبِيكَ", "post": "", "tr": "Babana selam verdim.", "role": "mecrûr (harf-i cerle)", "cs": "C", "al": "yâ", "f": ["أَبِيكَ", "أَبُوكَ", "أَبَاكَ"]}, {"k": 7, "pre": "", "tg": "أَخُوكَ", "post": " طَبِيبٌ", "tr": "Kardeşin doktordur.", "role": "mübtedâ", "cs": "R", "al": "vâv", "f": ["أَخُوكَ", "أَخَاكَ", "أَخِيكَ"]}, {"k": 7, "pre": "زُرْتُ ", "tg": "أَخَاكَ", "post": "", "tr": "Kardeşini ziyaret ettim.", "role": "mef'ûl bih", "cs": "N", "al": "elif", "f": ["أَخَاكَ", "أَخُوكَ", "أَخِيكَ"]}, {"k": 7, "pre": "هٰذَا كِتَابُ ", "tg": "أَخِيكَ", "post": "", "tr": "Bu, kardeşinin kitabıdır.", "role": "muzâfun ileyh", "cs": "C", "al": "yâ", "f": ["أَخِيكَ", "أَخُوكَ", "أَخَاكَ"]}, {"k": 7, "pre": "إِنَّ ", "tg": "أَبَاكَ", "post": " كَرِيمٌ", "tr": "Şüphesiz baban cömerttir.", "role": "inne ve kardeşlerinin ismi", "cs": "N", "al": "elif", "f": ["أَبَاكَ", "أَبُوكَ", "أَبِيكَ"]}, {"k": 7, "pre": "كَانَ ", "tg": "أَبُوكَ", "post": " مُعَلِّمًا", "tr": "Baban öğretmendi.", "role": "kâne ve kardeşlerinin ismi", "cs": "R", "al": "vâv", "f": ["أَبُوكَ", "أَبَاكَ", "أَبِيكَ"]}, {"k": 7, "pre": "جَاءَ ", "tg": "ذُو", "post": " عِلْمٍ", "tr": "İlim sahibi biri geldi.", "role": "fâil", "cs": "R", "al": "vâv", "f": ["ذُو", "ذَا", "ذِي"]}, {"k": 7, "pre": "مَرَرْتُ بِرَجُلٍ ", "tg": "ذِي", "post": " مَالٍ", "tr": "Mal sahibi bir adama uğradım.", "role": "sıfat", "cs": "C", "al": "yâ", "f": ["ذِي", "ذُو", "ذَا"]}, {"k": 8, "pre": "", "tg": "يَكْتُبُ", "post": " الطَّالِبُ الدَّرْسَ", "tr": "Öğrenci dersi yazıyor.", "role": "merfû muzâri", "cs": "R", "al": "damme", "f": ["يَكْتُبُ", "يَكْتُبَ", "يَكْتُبْ"]}, {"k": 8, "pre": "أُرِيدُ أَنْ ", "tg": "أَذْهَبَ", "post": "", "tr": "Gitmek istiyorum.", "role": "mansûb muzâri", "cs": "N", "al": "fetha", "f": ["أَذْهَبَ", "أَذْهَبُ", "أَذْهَبْ"]}, {"k": 8, "pre": "لَنْ ", "tg": "يَنْجَحَ", "post": " الْكَسْلَانُ", "tr": "Tembel başaramayacak.", "role": "mansûb muzâri", "cs": "N", "al": "fetha", "f": ["يَنْجَحَ", "يَنْجَحُ", "يَنْجَحْ"]}, {"k": 8, "pre": "جِئْتُ كَيْ ", "tg": "أَتَعَلَّمَ", "post": "", "tr": "Öğrenmek için geldim.", "role": "mansûb muzâri", "cs": "N", "al": "fetha", "f": ["أَتَعَلَّمَ", "أَتَعَلَّمُ", "أَتَعَلَّمْ"]}, {"k": 8, "pre": "لَمْ ", "tg": "يَحْضُرْ", "post": " أَحَدٌ", "tr": "Kimse gelmedi.", "role": "meczûm muzâri", "cs": "Z", "al": "sükûn", "f": ["يَحْضُرْ", "يَحْضُرُ", "يَحْضُرَ"]}, {"k": 8, "pre": "لَا ", "tg": "تَكْذِبْ", "post": "", "tr": "Yalan söyleme.", "role": "meczûm muzâri", "cs": "Z", "al": "sükûn", "f": ["تَكْذِبْ", "تَكْذِبُ", "تَكْذِبَ"]}, {"k": 8, "pre": "إِنْ ", "tg": "تَدْرُسْ", "post": " تَنْجَحْ", "tr": "Çalışırsan başarırsın.", "role": "meczûm muzâri", "cs": "Z", "al": "sükûn", "f": ["تَدْرُسْ", "تَدْرُسُ", "تَدْرُسَ"]}, {"k": 8, "pre": "الطُّلَّابُ ", "tg": "يَكْتُبُونَ", "post": " الدَّرْسَ", "tr": "Öğrenciler dersi yazıyor.", "role": "merfû muzâri", "cs": "R", "al": "nûnun sübûtu", "f": ["يَكْتُبُونَ", "يَكْتُبُوا"]}, {"k": 8, "pre": "الطُّلَّابُ لَمْ ", "tg": "يَكْتُبُوا", "post": " الدَّرْسَ", "tr": "Öğrenciler dersi yazmadı.", "role": "meczûm muzâri", "cs": "Z", "al": "nûnun düşmesi", "f": ["يَكْتُبُوا", "يَكْتُبُونَ"]}, {"k": 8, "pre": "لَنْ ", "tg": "تَذْهَبُوا", "post": " الْيَوْمَ", "tr": "Bugün gitmeyeceksiniz.", "role": "mansûb muzâri", "cs": "N", "al": "nûnun düşmesi", "f": ["تَذْهَبُوا", "تَذْهَبُونَ"]}, {"k": 8, "pre": "لَمْ ", "tg": "يَدْعُ", "post": " الرَّجُلُ أَحَدًا", "tr": "Adam kimseyi çağırmadı.", "role": "meczûm muzâri", "cs": "Z", "al": "illet harfinin düşmesi", "f": ["يَدْعُ", "يَدْعُو", "يَدْعُوَ"]}, {"k": 8, "pre": "لَمْ ", "tg": "يَمْشِ", "post": " الْوَلَدُ", "tr": "Çocuk yürümedi.", "role": "meczûm muzâri", "cs": "Z", "al": "illet harfinin düşmesi", "f": ["يَمْشِ", "يَمْشِي", "يَمْشِيَ"]}, {"k": 9, "pre": "كُتِبَ ", "tg": "الدَّرْسُ", "post": "", "tr": "Ders yazıldı.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["الدَّرْسُ", "الدَّرْسَ", "الدَّرْسِ"]}, {"k": 9, "pre": "فُتِحَ ", "tg": "الْبَابُ", "post": "", "tr": "Kapı açıldı.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["الْبَابُ", "الْبَابَ", "الْبَابِ"]}, {"k": 9, "pre": "يُكْرَمُ ", "tg": "الضَّيْفُ", "post": "", "tr": "Misafire ikram edilir.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["الضَّيْفُ", "الضَّيْفَ", "الضَّيْفِ"]}, {"k": 9, "pre": "سُئِلَ ", "tg": "الطَّالِبَانِ", "post": "", "tr": "İki öğrenciye soruldu.", "role": "nâib-i fâil", "cs": "R", "al": "elif", "f": ["الطَّالِبَانِ", "الطَّالِبَيْنِ"]}, {"k": 9, "pre": "خُلِقَ ", "tg": "الْإِنْسَانُ", "post": " ضَعِيفًا", "tr": "İnsan zayıf yaratıldı.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["الْإِنْسَانُ", "الْإِنْسَانَ", "الْإِنْسَانِ"]}, {"k": 9, "pre": "كُرِّمَ ", "tg": "الْمُعَلِّمُونَ", "post": "", "tr": "Öğretmenler onurlandırıldı.", "role": "nâib-i fâil", "cs": "R", "al": "vâv", "f": ["الْمُعَلِّمُونَ", "الْمُعَلِّمِينَ"]}, {"k": 9, "pre": "تُقْرَأُ ", "tg": "الْكُتُبُ", "post": " فِي الْمَكْتَبَةِ", "tr": "Kitaplar kütüphanede okunur.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["الْكُتُبُ", "الْكُتُبَ", "الْكُتُبِ"]}, {"k": 9, "pre": "سُرِقَتْ ", "tg": "حَقِيبَةٌ", "post": "", "tr": "Bir çanta çalındı.", "role": "nâib-i fâil", "cs": "R", "al": "damme", "f": ["حَقِيبَةٌ", "حَقِيبَةً", "حَقِيبَةٍ"]}, {"k": 10, "pre": "حَفِظْتُ الدَّرْسَ ", "tg": "حِفْظًا", "post": "", "tr": "Dersi iyice ezberledim.", "role": "mef'ûl mutlak", "cs": "N", "al": "fetha", "f": ["حِفْظًا", "حِفْظٌ", "حِفْظٍ"]}, {"k": 10, "pre": "فَرِحْتُ ", "tg": "فَرَحًا", "post": " شَدِيدًا", "tr": "Çok sevindim.", "role": "mef'ûl mutlak", "cs": "N", "al": "fetha", "f": ["فَرَحًا", "فَرَحٌ", "فَرَحٍ"]}, {"k": 10, "pre": "وَقَفْتُ ", "tg": "اِحْتِرَامًا", "post": " لِلْمُعَلِّمِ", "tr": "Öğretmene saygımdan ayağa kalktım.", "role": "mef'ûl leh", "cs": "N", "al": "fetha", "f": ["اِحْتِرَامًا", "اِحْتِرَامٌ", "اِحْتِرَامٍ"]}, {"k": 10, "pre": "سَافَرْتُ ", "tg": "طَلَبًا", "post": " لِلْعِلْمِ", "tr": "İlim talebi için yolculuk ettim.", "role": "mef'ûl leh", "cs": "N", "al": "fetha", "f": ["طَلَبًا", "طَلَبٌ", "طَلَبٍ"]}, {"k": 10, "pre": "سَافَرْتُ ", "tg": "لَيْلًا", "post": "", "tr": "Geceleyin yolculuk ettim.", "role": "zarf (mef'ûl fîh)", "cs": "N", "al": "fetha", "f": ["لَيْلًا", "لَيْلٌ", "لَيْلٍ"]}, {"k": 10, "pre": "صُمْتُ ", "tg": "يَوْمًا", "post": "", "tr": "Bir gün oruç tuttum.", "role": "zarf (mef'ûl fîh)", "cs": "N", "al": "fetha", "f": ["يَوْمًا", "يَوْمٌ", "يَوْمٍ"]}, {"k": 10, "pre": "جَلَسْتُ ", "tg": "أَمَامَ", "post": " الْمُعَلِّمِ", "tr": "Öğretmenin önünde oturdum.", "role": "zarf (mef'ûl fîh)", "cs": "N", "al": "fetha", "f": ["أَمَامَ", "أَمَامُ", "أَمَامِ"]}, {"k": 10, "pre": "جَاءَ الطَّالِبُ ", "tg": "مُسْرِعًا", "post": "", "tr": "Öğrenci koşarak geldi.", "role": "hâl", "cs": "N", "al": "fetha", "f": ["مُسْرِعًا", "مُسْرِعٌ", "مُسْرِعٍ"]}, {"k": 10, "pre": "رَجَعَ الْمُسَافِرُ ", "tg": "سَالِمًا", "post": "", "tr": "Yolcu sağ salim döndü.", "role": "hâl", "cs": "N", "al": "fetha", "f": ["سَالِمًا", "سَالِمٌ", "سَالِمٍ"]}, {"k": 10, "pre": "دَخَلَ الطُّلَّابُ ", "tg": "مُبْتَسِمِينَ", "post": "", "tr": "Öğrenciler gülümseyerek girdi.", "role": "hâl", "cs": "N", "al": "yâ", "f": ["مُبْتَسِمِينَ", "مُبْتَسِمُونَ"]}, {"k": 10, "pre": "اِشْتَرَيْتُ عِشْرِينَ ", "tg": "كِتَابًا", "post": "", "tr": "Yirmi kitap satın aldım.", "role": "temyiz", "cs": "N", "al": "fetha", "f": ["كِتَابًا", "كِتَابٌ", "كِتَابٍ"]}, {"k": 10, "pre": "عِنْدِي أَحَدَ عَشَرَ ", "tg": "قَلَمًا", "post": "", "tr": "On bir kalemim var.", "role": "temyiz", "cs": "N", "al": "fetha", "f": ["قَلَمًا", "قَلَمٌ", "قَلَمٍ"]}, {"k": 10, "pre": "هُوَ أَكْثَرُ مِنِّي ", "tg": "عِلْمًا", "post": "", "tr": "O, ilimce benden ileridir.", "role": "temyiz", "cs": "N", "al": "fetha", "f": ["عِلْمًا", "عِلْمٌ", "عِلْمٍ"]}, {"k": 10, "pre": "طَابَ الْمُعَلِّمُ ", "tg": "نَفْسًا", "post": "", "tr": "Öğretmenin gönlü hoş oldu.", "role": "temyiz", "cs": "N", "al": "fetha", "f": ["نَفْسًا", "نَفْسٌ", "نَفْسٍ"]}, {"k": 11, "pre": "جَاءَ الْمُعَلِّمُ ", "tg": "وَالطَّالِبُ", "post": "", "tr": "Öğretmen ve öğrenci geldi.", "role": "ma'tûf", "cs": "R", "al": "damme", "f": ["وَالطَّالِبُ", "وَالطَّالِبَ", "وَالطَّالِبِ"]}, {"k": 11, "pre": "قَرَأْتُ الْكِتَابَ ", "tg": "وَالْمَجَلَّةَ", "post": "", "tr": "Kitabı ve dergiyi okudum.", "role": "ma'tûf", "cs": "N", "al": "fetha", "f": ["وَالْمَجَلَّةَ", "وَالْمَجَلَّةُ", "وَالْمَجَلَّةِ"]}, {"k": 11, "pre": "سَلَّمْتُ عَلَى الْمُعَلِّمِ ", "tg": "وَالْمُدِيرِ", "post": "", "tr": "Öğretmene ve müdüre selam verdim.", "role": "ma'tûf", "cs": "C", "al": "kesre", "f": ["وَالْمُدِيرِ", "وَالْمُدِيرُ", "وَالْمُدِيرَ"]}, {"k": 11, "pre": "جَاءَ الْخَلِيفَةُ ", "tg": "عُمَرُ", "post": "", "tr": "Halife Ömer geldi.", "role": "bedel", "cs": "R", "al": "damme", "f": ["عُمَرُ", "عُمَرَ", "عُمَرِ"]}, {"k": 11, "pre": "أَعْجَبَنِي الطَّالِبُ ", "tg": "خُلُقُهُ", "post": "", "tr": "Öğrencinin ahlâkı hoşuma gitti.", "role": "bedel", "cs": "R", "al": "damme", "f": ["خُلُقُهُ", "خُلُقَهُ", "خُلُقِهِ"]}, {"k": 11, "pre": "جَاءَ الطُّلَّابُ ", "tg": "كُلُّهُمْ", "post": "", "tr": "Öğrencilerin hepsi geldi.", "role": "te'kîd", "cs": "R", "al": "damme", "f": ["كُلُّهُمْ", "كُلَّهُمْ", "كُلِّهِمْ"]}, {"k": 11, "pre": "رَأَيْتُ الْمُعَلِّمَ ", "tg": "نَفْسَهُ", "post": "", "tr": "Öğretmenin kendisini gördüm.", "role": "te'kîd", "cs": "N", "al": "fetha", "f": ["نَفْسَهُ", "نَفْسُهُ", "نَفْسِهِ"]}, {"k": 11, "pre": "يَا ", "tg": "طَالِبَ", "post": " الْعِلْمِ، اِجْتَهِدْ", "tr": "Ey ilim talebesi, çalış!", "role": "münâdâ", "cs": "N", "al": "fetha", "f": ["طَالِبَ", "طَالِبُ", "طَالِبِ"]}, {"k": 11, "pre": "يَا ", "tg": "عَبْدَ", "post": " اللهِ", "tr": "Ey Allah'ın kulu!", "role": "münâdâ", "cs": "N", "al": "fetha", "f": ["عَبْدَ", "عَبْدُ", "عَبْدِ"]}, {"k": 11, "pre": "حَضَرَ الطُّلَّابُ إِلَّا ", "tg": "طَالِبًا", "post": "", "tr": "Bir öğrenci dışında öğrenciler geldi.", "role": "müstesnâ", "cs": "N", "al": "fetha", "f": ["طَالِبًا", "طَالِبٌ", "طَالِبٍ"]}, {"k": 11, "pre": "قَرَأْتُ الْكُتُبَ إِلَّا ", "tg": "كِتَابًا", "post": "", "tr": "Bir kitap dışında kitapları okudum.", "role": "müstesnâ", "cs": "N", "al": "fetha", "f": ["كِتَابًا", "كِتَابٌ", "كِتَابٍ"]}, {"k": 11, "pre": "مَا جَاءَ إِلَّا ", "tg": "خَالِدٌ", "post": "", "tr": "Hâlid'den başkası gelmedi.", "role": "fâil", "cs": "R", "al": "damme", "f": ["خَالِدٌ", "خَالِدًا", "خَالِدٍ"]}]};
+const KN=DATA.K, Q=DATA.Q;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}},del(k){try{localStorage.removeItem(k);}catch(e){}}};
+let off=0; // sunucu saati farkı
+const now=()=>Date.now()+off;
+async function get(params){const u=API+"?"+new URLSearchParams(params);const r=await fetch(u,{cache:"no-store"});const j=await r.json();if(j.simdi)off=j.simdi-Date.now();return j;}
+async function post(body){const r=await fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(body)});const j=await r.json();if(j.simdi)off=j.simdi-Date.now();return j;}
+const fmt=ms=>{ms=Math.max(0,ms);const s=Math.ceil(ms/1000);return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");};
+
+// --- Tohumlu rastgelelik: aynı oturumda herkese aynı sorular ---
+function hashStr(s){let h=1779033703^s.length;for(let i=0;i<s.length;i++){h=Math.imul(h^s.charCodeAt(i),3432918353);h=h<<13|h>>>19;}return h>>>0;}
+function rng(seed){let a=seed;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const shuf=(a,r)=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+const CS={R:"merfû",N:"mansûb",C:"mecrûr",Z:"meczûm"};
+const VERB=["merfû muzâri","mansûb muzâri","meczûm muzâri"];
+const BYCASE={R:["mübtedâ","haber","fâil","nâib-i fâil","kâne ve kardeşlerinin ismi","inne ve kardeşlerinin haberi","sıfat","ma'tûf","bedel","te'kîd"],
+  N:["mef'ûl bih","inne ve kardeşlerinin ismi","kâne ve kardeşlerinin haberi","hâl","temyiz","mef'ûl mutlak","mef'ûl leh","zarf (mef'ûl fîh)","müstesnâ","münâdâ","sıfat"],
+  C:["mecrûr (harf-i cerle)","muzâfun ileyh","sıfat","ma'tûf","bedel"]};
+const ALL=[...new Set([...BYCASE.R,...BYCASE.N,...BYCASE.C])];
+const EXCL={"kâne ve kardeşlerinin ismi":["mübtedâ"],"kâne ve kardeşlerinin haberi":["haber"],"inne ve kardeşlerinin ismi":["mübtedâ"],"inne ve kardeşlerinin haberi":["haber"],
+  "mübtedâ":["kâne ve kardeşlerinin ismi","inne ve kardeşlerinin ismi"],"haber":["kâne ve kardeşlerinin haberi","inne ve kardeşlerinin haberi"],"mef'ûl mutlak":["mef'ûl leh"],"bedel":["te'kîd","sıfat"],"te'kîd":["bedel","sıfat"],"sıfat":["bedel","te'kîd","hâl"],"hâl":["sıfat","kâne ve kardeşlerinin haberi"],"müstesnâ":["mef'ûl bih"]};
+const SIGNS=["damme","fetha","kesre","sükûn","elif","vâv","yâ","nûnun sübûtu","nûnun düşmesi","illet harfinin düşmesi"];
+const NEAR={"kesre (fetha yerine)":["fetha","yâ","elif"],"fetha (kesre yerine)":["kesre","yâ","damme"],"nûnun düşmesi":["nûnun sübûtu","sükûn","fetha"],"nûnun sübûtu":["nûnun düşmesi","damme","vâv"],"illet harfinin düşmesi":["sükûn","nûnun düşmesi","kesre"],
+  "vâv":["damme","elif","yâ"],"elif":["fetha","vâv","yâ"],"yâ":["kesre","fetha","elif"],"damme":["vâv","fetha","kesre"],"fetha":["elif","kesre (fetha yerine)","damme"],"kesre":["yâ","fetha (kesre yerine)","fetha"],"sükûn":["illet harfinin düşmesi","nûnun düşmesi","fetha"]};
+const sent=(q,blank)=>`<div class="ayah sent">${q.pre}<span class="tg">${blank?"……":q.tg}</span>${q.post}</div>`;
+
+// Oturum için soru seti: herkes aynı soruları aynı şıklarla alır, sıra öğrenciye göre karışır
+function buildExam(s,studentKey){
+  const r=rng(hashStr(s.oturum));
+  const pool=Q.filter(q=>!s.konu||q.k===s.konu);
+  const types=["gorev","alamet","hareke"];
+  const cand=[];pool.forEach((q,i)=>types.forEach(t=>cand.push([i,t])));
+  shuf(cand,r);
+  const used=new Set(),pick=[];
+  for(const [i,t] of cand){if(pick.length>=s.n)break;if(used.has(i)&&pick.length<pool.length)continue;used.add(i);pick.push([i,t]);}
+  for(const [i,t] of cand){if(pick.length>=s.n)break;if(!pick.some(p=>p[0]===i&&p[1]===t))pick.push([i,t]);}
+  const items=pick.map(([i,t],x)=>{const q=pool[i];let opts,prompt,head;
+    if(t==="gorev"){prompt="Renkli kelimenin cümledeki görevi nedir?";head=sent(q);
+      if(VERB.includes(q.role))opts=shuf([...VERB,"mâzî fiil"],r);
+      else{const bad=new Set([q.role,...(EXCL[q.role]||[])]);const same=shuf(BYCASE[q.cs].filter(z=>!bad.has(z)),r).slice(0,2);same.forEach(z=>bad.add(z));
+        opts=shuf([q.role,...same,...shuf(ALL.filter(z=>!bad.has(z)),r).slice(0,3-same.length)],r);}
+      opts=opts.map(o=>({t:o,ok:o===q.role}));}
+    if(t==="alamet"){prompt=`Renkli kelime ${CS[q.cs]}dur. İ'râb alameti nedir?`;head=sent(q);
+      opts=shuf([q.al,...(NEAR[q.al]||shuf(SIGNS.filter(z=>z!==q.al),r).slice(0,3))],r).map(o=>({t:o,ok:o===q.al}));}
+    if(t==="hareke"){prompt="Boşluğa hangisi gelmelidir?";head=sent(q,true);
+      opts=shuf(q.f.slice(),r).map(o=>({t:o,ok:o===q.tg,ar:true}));}
+    return {id:x,t,q,prompt,head,opts};});
+  return shuf(items,rng(hashStr(s.oturum+"|"+studentKey)));
+}
+
+// ---------------- ÖĞRENCİ ----------------
+let S=null, exam=null, st=null, tick=null, poll=null;
+function studentStart(){
+  const me=LS.get("sinav-ogrenci",{ad:"",no:""});
+  $("#app").innerHTML=`<section class="card">
+    <p class="prompt">Sınava giriş</p>
+    <label class="fl">Ad Soyad<input id="ad" class="search" autocomplete="name" value="${esc(me.ad)}"></label>
+    <label class="fl">Öğrenci numarası<input id="no" class="search" inputmode="numeric" value="${esc(me.no)}"></label>
+    <button class="next" id="gir">Sınava gir</button>
+    <div class="note" id="msg"></div></section>
+    <div class="note">Sınav öğretmeniniz başlatınca açılır ve süre bitince kendiliğinden kapanır. Süre içinde cevaplarınızı değiştirebilirsiniz.</div>
+    <div class="note"><a class="applink" href="#ogretmen">Öğretmen paneli</a></div>`;
+  $("#gir").onclick=()=>{const ad=$("#ad").value.trim(),no=$("#no").value.trim();
+    if(ad.length<3||!no){$("#msg").textContent="Ad soyad ve numaranızı yazın.";return;}
+    LS.set("sinav-ogrenci",{ad,no});waitOpen(ad,no);};
+}
+async function waitOpen(ad,no){
+  $("#app").innerHTML=`<section class="card"><p class="prompt">Hoş geldiniz, ${esc(ad)}.</p><div class="note" id="w">Sınav durumu kontrol ediliyor…</div></section>`;
+  clearInterval(poll);
+  const check=async()=>{try{S=await get({a:"durum"});}catch(e){$("#w").textContent="Bağlantı kurulamadı, tekrar deneniyor…";return;}
+    if(S.acik){
+      if(LS.get("sinav-bitti-"+S.oturum,null)){clearInterval(poll);return showDone(LS.get("sinav-bitti-"+S.oturum));}
+      clearInterval(poll);beginExam(ad,no);}
+    else $("#w").innerHTML=`<span class="pulse"></span> Öğretmeninizin sınavı başlatması bekleniyor. Bu sayfayı kapatmayın.`;};
+  await check();poll=setInterval(check,3000);
+}
+function beginExam(ad,no){
+  exam=buildExam(S,no);
+  st=LS.get("sinav-durum-"+S.oturum,null)||{ans:{},cur:0,sekme:0,t0:now()};
+  st.ad=ad;st.no=no;save();
+  document.addEventListener("visibilitychange",onVis);
+  $("#timer").hidden=false;
+  clearInterval(tick);tick=setInterval(()=>{const left=S.bit-now();$("#timer").textContent="⏱ "+fmt(left);$("#timer").classList.toggle("low",left<60000);if(left<=0)finish(true);},250);
+  // öğretmen erken kapatırsa
+  clearInterval(poll);poll=setInterval(async()=>{try{const d=await get({a:"durum"});if(d.oturum===S.oturum&&!d.acik){S.bit=Math.min(S.bit,d.bit);if(now()>=S.bit)finish(true);}}catch(e){}},10000);
+  renderQ();
+}
+const save=()=>LS.set("sinav-durum-"+S.oturum,st);
+function onVis(){if(document.hidden&&exam){st.sekme++;save();}}
+function renderQ(){
+  const it=exam[st.cur],a=st.ans[it.id];
+  $("#top").innerHTML=`${esc(st.ad)} · soru <b>${st.cur+1}</b>/${exam.length} · cevaplanan <b>${Object.keys(st.ans).length}</b>`;
+  $("#app").innerHTML=`<section class="card"><div class="kind">${KN[it.q.k]}</div><p class="prompt">${it.prompt}</p>${it.head}<div class="ref">${esc(it.q.tr)}</div>
+    <div class="opts${it.opts.length===2?" two":""}">${it.opts.map((o,i)=>`<button class="opt ${o.ar?"":"mean"}${a===i?" sel":""}" data-i="${i}">${o.ar?`<span class="arw">${o.t}</span>`:esc(o.t)}</button>`).join("")}</div></section>
+    <div class="dots">${exam.map((e,i)=>`<button class="dot${st.ans[e.id]!==undefined?" done":""}${i===st.cur?" cur":""}" data-j="${i}">${i+1}</button>`).join("")}</div>
+    <div class="row2"><button class="btn" id="prev"${st.cur?"":" disabled"}>← Önceki</button><button class="btn" id="nxt">${st.cur<exam.length-1?"Sonraki →":"Başa dön"}</button></div>
+    <button class="btn danger wide" id="fin">Sınavı bitir ve gönder</button>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{st.ans[it.id]=+b.dataset.i;save();
+    const nx=exam.findIndex((e,i)=>i>st.cur&&st.ans[e.id]===undefined);
+    setTimeout(()=>{st.cur=nx>=0?nx:Math.min(st.cur+1,exam.length-1);save();renderQ();},180);
+    b.classList.add("sel");});
+  document.querySelectorAll(".dot").forEach(b=>b.onclick=()=>{st.cur=+b.dataset.j;save();renderQ();});
+  $("#prev").onclick=()=>{st.cur--;save();renderQ();};
+  $("#nxt").onclick=()=>{st.cur=st.cur<exam.length-1?st.cur+1:0;save();renderQ();};
+  let armed=false;$("#fin").onclick=e=>{const bos=exam.length-Object.keys(st.ans).length;
+    if(!armed){armed=true;e.target.textContent=bos?`${bos} boş soru var. Yine de göndermek için tekrar dokunun`:"Göndermek için tekrar dokunun";setTimeout(()=>{armed=false;if(e.target.isConnected)e.target.textContent="Sınavı bitir ve gönder";},4000);return;}
+    finish(false);};
+  window.scrollTo({top:0});
+}
+let finishing=false;
+async function finish(auto){
+  if(finishing)return;finishing=true;clearInterval(tick);clearInterval(poll);$("#timer").hidden=true;
+  document.removeEventListener("visibilitychange",onVis);
+  let d=0,y=0,b=0;const cev=[];
+  exam.forEach((it,i)=>{const a=st.ans[it.id];if(a===undefined){b++;cev.push("-");}else if(it.opts[a].ok){d++;cev.push("D");}else{y++;cev.push("Y");}});
+  const puan=Math.round(100*d/exam.length);
+  const res={oturum:S.oturum,ad:st.ad,numara:st.no,puan,dogru:d,yanlis:y,bos:b,sn:Math.round((Math.min(now(),S.bit)-st.t0)/1000),sekme:st.sekme,cevaplar:cev.join("")};
+  $("#app").innerHTML=`<section class="card"><p class="prompt">${auto?"Süre doldu.":"Sınav bitti."} Cevaplarınız gönderiliyor…</p></section>`;
+  let ok=false;for(let k=0;k<4&&!ok;k++){try{const r=await post(Object.assign({a:"gonder"},res));ok=!!r.ok;}catch(e){await new Promise(z=>setTimeout(z,1500*(k+1)));}}
+  const done=Object.assign(res,{gonderildi:ok,detay:exam.map(it=>({s:it.q.pre+it.q.tg+it.q.post,soru:it.prompt,dogru:it.opts.find(o=>o.ok).t,ar:!!it.opts[0].ar,ver:st.ans[it.id]===undefined?null:it.opts[st.ans[it.id]].t,ok:st.ans[it.id]!==undefined&&it.opts[st.ans[it.id]].ok}))});
+  LS.set("sinav-bitti-"+S.oturum,done);LS.del("sinav-durum-"+S.oturum);
+  showDone(done);
+}
+function showDone(r){
+  $("#timer").hidden=true;
+  $("#top").innerHTML=`${esc(r.ad)} · ${esc(r.numara)}`;
+  $("#app").innerHTML=`<section class="card"><div class="kind">Sonucunuz</div>
+    <div class="bignum">${r.puan}<small style="font-size:1rem"> puan</small></div>
+    <div class="ref">${r.dogru} doğru · ${r.yanlis} yanlış · ${r.bos} boş</div>
+    <div class="note" style="text-align:center">${r.gonderildi===false?'<b style="color:var(--bad)">Sonuç gönderilemedi.</b> Bu ekranı öğretmeninize gösterin. <button class="btn" id="tekrar">Tekrar gönder</button>':"Sonucunuz öğretmeninize iletildi."}</div></section>
+    <h3 class="sh">Cevap anahtarı</h3>
+    <div class="list" id="key">${!S||S.acik&&S.oturum===r.oturum&&now()<S.bit?'<div class="note">Cevap anahtarı, sınav herkes için kapanınca burada görünecek.</div>':(r.detay||[]).map((x,i)=>`<div class="wrow col${x.ok?" ok":""}"><div class="ayah sent">${x.s}</div><div class="m">${i+1}. ${esc(x.soru)}<small>Doğru: <b ${x.ar?'dir="rtl" class="arw"':""}>${x.dogru}</b>${x.ok?"":" · Sizin cevabınız: "+(x.ver===null?"boş":`<span ${x.ar?'dir="rtl" class="arw"':""}>${x.ver}</span>`)}</small></div></div>`).join("")}</div>`;
+  if(S&&S.acik&&S.oturum===r.oturum&&now()<S.bit){clearInterval(poll);poll=setInterval(async()=>{try{const d=await get({a:"durum"});if(d.oturum!==r.oturum||!d.acik){S=d;clearInterval(poll);showDone(r);}}catch(e){}},5000);}
+  const t=$("#tekrar");if(t)t.onclick=async()=>{t.disabled=true;try{const q=await post(Object.assign({a:"gonder"},r,{detay:undefined}));if(q.ok){r.gonderildi=true;LS.set("sinav-bitti-"+r.oturum,r);showDone(r);}else t.disabled=false;}catch(e){t.disabled=false;}};
+}
+
+// ---------------- ÖĞRETMEN ----------------
+let PIN=null, rpoll=null;
+function teacher(){
+  clearInterval(poll);clearInterval(tick);$("#timer").hidden=true;
+  PIN=sessionStorage.getItem("sinav-pin");
+  if(!PIN){$("#top").textContent="Öğretmen paneli";
+    $("#app").innerHTML=`<section class="card"><p class="prompt">Öğretmen girişi</p><label class="fl">Şifre<input id="pin" type="password" class="search"></label><button class="next" id="pg">Giriş</button><div class="note" id="msg"></div></section>
+    <div class="note"><a class="applink" href="#">← Öğrenci ekranı</a></div>`;
+    $("#pg").onclick=async()=>{const p=$("#pin").value.trim();try{const r=await get({a:"sonuclar",pin:p});if(r.hata){$("#msg").textContent="Şifre yanlış.";return;}PIN=p;sessionStorage.setItem("sinav-pin",p);panel(r);}catch(e){$("#msg").textContent="Bağlantı kurulamadı.";}};
+    return;}
+  get({a:"sonuclar",pin:PIN}).then(r=>{if(r.hata){sessionStorage.removeItem("sinav-pin");return teacher();}panel(r);}).catch(()=>{$("#app").innerHTML='<div class="note">Bağlantı kurulamadı.</div>';});
+}
+function panel(r){
+  const lastKonu=LS.get("sinav-ayar",{konu:0,n:20,sure:5});
+  $("#top").innerHTML=`Öğretmen paneli · <a class="applink" href="#" id="cik">çıkış</a>`;
+  $("#app").innerHTML=`<section class="card" id="ctl"></section><h3 class="sh" id="rh"></h3><div id="res"></div>
+    <div class="row2"><button class="btn" id="csv">Excel'e aktar (CSV)</button><a class="btn" href="#" id="ogr" style="text-align:center;text-decoration:none">Öğrenci ekranı</a></div>`;
+  $("#cik").onclick=e=>{e.preventDefault();sessionStorage.removeItem("sinav-pin");clearInterval(rpoll);location.hash="";};
+  const ctl=()=>{
+    if(r.acik){$("#ctl").innerHTML=`<div class="kind">Sınav açık · oturum ${esc(r.oturum)}</div><p class="prompt">${esc(r.konuAdi)} · ${r.n} soru · ${r.sure} dk</p>
+      <div class="bignum" id="kalan">${fmt(r.bit-now())}</div><div class="ref">kalan süre</div><button class="btn danger wide" id="kapat">Sınavı şimdi kapat</button>`;
+      let armed=false;$("#kapat").onclick=async e=>{if(!armed){armed=true;e.target.textContent="Kapatmak için tekrar dokunun";return;}e.target.disabled=true;r=Object.assign(r,await post({a:"kapat",pin:PIN}));ctl();};}
+    else{$("#ctl").innerHTML=`<div class="kind">Yeni sınav</div>
+      <label class="fl">Konu<select id="konu">${["Bütün konular",...Object.values(KN)].map((k,i)=>`<option value="${i}"${i==lastKonu.konu?" selected":""}>${i?i+". ":""}${k} (${Q.filter(q=>!i||q.k===i).length} cümle)</option>`).join("")}</select></label>
+      <div class="row2"><label class="fl">Soru sayısı<select id="n">${[10,15,20,25,30].map(x=>`<option${x==lastKonu.n?" selected":""}>${x}</option>`).join("")}</select></label>
+      <label class="fl">Süre (dk)<select id="sure">${[3,5,7,10,15,20,30].map(x=>`<option${x==lastKonu.sure?" selected":""}>${x}</option>`).join("")}</select></label></div>
+      <button class="next" id="bas">Sınavı başlat</button><div class="note">Öğrenciler giriş yapıp bekleme ekranında olmalı. Başlatınca hepsinde aynı anda açılır, süre bitince kapanır.</div>`;
+      $("#bas").onclick=async e=>{e.target.disabled=true;const a={konu:+$("#konu").value,n:+$("#n").value,sure:+$("#sure").value};LS.set("sinav-ayar",a);
+        const x=await post(Object.assign({a:"baslat",pin:PIN},a));if(x.hata){alert("Başlatılamadı");e.target.disabled=false;return;}r=Object.assign(x,{sonuclar:[]});ctl();res();};}
+  };
+  const res=()=>{const L=(r.sonuclar||[]).slice().sort((a,b)=>b.puan-a.puan||a.sn-b.sn);
+    const ort=L.length?Math.round(L.reduce((s,x)=>s+Number(x.puan),0)/L.length):0;
+    $("#rh").innerHTML=r.oturum?`Sonuçlar · oturum ${esc(r.oturum)} · ${L.length} öğrenci${L.length?` · ortalama ${ort}`:""}`:"Henüz sınav yapılmadı";
+    $("#res").innerHTML=L.length?`<table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Puan</th><th>D/Y/B</th><th>Süre</th><th>Not</th></tr></thead><tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.ad)}</td><td>${esc(x.no)}</td><td><b>${x.puan}</b></td><td>${x.dogru}/${x.yanlis}/${x.bos}</td><td>${fmt(x.sn*1000)}</td><td>${x.durum!=="zamanında"?esc(x.durum):""}${x.sekme?` sekme:${x.sekme}`:""}</td></tr>`).join("")}</tbody></table>`:`<div class="note">${r.acik?"Gönderen öğrenci olunca burada görünecek.":""}</div>`;
+    $("#csv").onclick=()=>{const rows=[["Sıra","Ad Soyad","Numara","Puan","Doğru","Yanlış","Boş","Süre (sn)","Sekme değiştirme","Durum"],...L.map((x,i)=>[i+1,x.ad,x.no,x.puan,x.dogru,x.yanlis,x.bos,x.sn,x.sekme,x.durum])];
+      const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\r\n");
+      const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.download=`irab-sinavi-${r.oturum||"sonuc"}.csv`;a.click();};};
+  ctl();res();
+  clearInterval(rpoll);rpoll=setInterval(async()=>{
+    if(r.acik){const k=$("#kalan");if(k)k.textContent=fmt(r.bit-now());if(r.bit-now()<=0){r.acik=false;ctl();}}
+  },500);
+  let busy=false;setInterval(async()=>{if(busy||location.hash!=="#ogretmen")return;busy=true;try{const x=await get({a:"sonuclar",pin:PIN});if(!x.hata){const was=r.acik;r=x;if(was!==r.acik)ctl();res();}}catch(e){}busy=false;},5000);
+}
+
+function route(){if(location.hash==="#ogretmen")teacher();else{clearInterval(rpoll);studentStart();}}
+window.addEventListener("hashchange",()=>location.reload());
+if(API.startsWith("__")){$("#app").innerHTML='<div class="note">Sınav bağlantısı henüz kurulmadı.</div>';}else route();
+</script>
+</body></html>
