@@ -149,6 +149,8 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 
 .kpis.k4{grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}.kpis.k4 .kpi{padding:8px 4px}.kpis.k4 .kpi b{font-size:1.2rem}
 #rh{display:block}
+
+#dersSec .btn.on{background:var(--lapis);color:#fff;border-color:var(--lapis)}
 .sent2{font-size:1.45rem;line-height:2.05}
 .defn{font-size:1rem;line-height:1.5;background:var(--paper);border-radius:12px;padding:12px 14px;text-align:center}
 .opts.col1{grid-template-columns:1fr}
@@ -386,10 +388,16 @@ function panel(r){
       <div class="bignum" id="kalan">${fmt(r.bit-now())}</div><div class="ref">kalan süre</div><button class="btn danger wide" id="kapat">Sınavı şimdi kapat</button>`;
       let armed=false;$("#kapat").onclick=async e=>{if(!armed){armed=true;e.target.textContent="Kapatmak için tekrar dokunun";return;}e.target.disabled=true;r=Object.assign(r,await post({a:"kapat",pin:PIN}));ctl();};}
     else{$("#ctl").innerHTML=`<div class="kind">Yeni sınav</div>
-      <label class="fl">Konu<select id="konu"><optgroup label="İ'râb">${["Bütün konular",...Object.values(KN)].map((k,i)=>`<option value="${i}"${i==lastKonu.konu?" selected":""}>İ'râb: ${i?i+". ":""}${k} (${Q.filter(q=>!i||q.k===i).length} cümle)</option>`).join("")}</optgroup><optgroup label="Belâgat (Me'ânî)">${["Bütün konular",...Object.values(BK)].map((k,i)=>`<option value="${100+i}"${100+i==lastKonu.konu?" selected":""}>Belâgat: ${i?i+". ":""}${k} (${BEL.D.S.filter(x=>!i||x.k===i).length+BEL.D.T.filter(x=>!i||x.k===i).length} soru)</option>`).join("")}</optgroup></select></label>
+      <div class="fl">Ders<div class="row2" style="margin:0" id="dersSec"><button class="btn${(lastKonu.konu||0)<100?" on":""}" data-d="0">İ'râb</button><button class="btn${(lastKonu.konu||0)>=100?" on":""}" data-d="100">Belâgat</button></div></div>
+      <label class="fl">Konu<select id="konu"></select></label>
       <div class="row2"><label class="fl">Soru sayısı<select id="n">${[10,15,20,25,30].map(x=>`<option${x==lastKonu.n?" selected":""}>${x}</option>`).join("")}</select></label>
       <label class="fl">Süre (dk)<select id="sure">${[3,5,7,10,15,20,30].map(x=>`<option${x==lastKonu.sure?" selected":""}>${x}</option>`).join("")}</select></label></div>
-      <button class="next" id="bas">Sınavı başlat</button><div class="note">Öğrenciler giriş yapıp bekleme ekranında olmalı. Başlatınca hepsinde aynı anda açılır, süre bitince kapanır.</div>`;
+      <button class="next" id="bas">Sınavı başlat</button><div class="note" id="secim" style="text-align:center;font-weight:600"></div><div class="note">Öğrenciler giriş yapıp bekleme ekranında olmalı. Başlatınca hepsinde aynı anda açılır, süre bitince kapanır.</div>`;
+      const fillKonu=(d,sel)=>{const opts=d>=100?["Bütün konular",...Object.values(BK)].map((k,i)=>[100+i,`${i?i+". ":""}${k} (${BEL.D.S.filter(x=>!i||x.k===i).length+BEL.D.T.filter(x=>!i||x.k===i).length} soru)`]):["Bütün konular",...Object.values(KN)].map((k,i)=>[i,`${i?i+". ":""}${k} (${Q.filter(q=>!i||q.k===i).length} cümle)`]);
+        $("#konu").innerHTML=opts.map(([v,t])=>`<option value="${v}"${v==sel?" selected":""}>${t}</option>`).join("");if(!opts.some(o=>o[0]==sel))$("#konu").value=String(opts[0][0]);showSel();};
+      const showSel=()=>{$("#secim").textContent="Seçilen: "+konuAdi(+$("#konu").value)+" · "+$("#n").value+" soru · "+$("#sure").value+" dk";};
+      document.querySelectorAll("#dersSec button").forEach(bt=>bt.onclick=()=>{document.querySelectorAll("#dersSec button").forEach(x=>x.classList.toggle("on",x===bt));fillKonu(+bt.dataset.d,-1);});
+      fillKonu((lastKonu.konu||0)>=100?100:0,lastKonu.konu||0);["#konu","#n","#sure"].forEach(s=>$(s).onchange=showSel);
       $("#bas").onclick=async e=>{e.target.disabled=true;const a={konu:+$("#konu").value,n:+$("#n").value,sure:+$("#sure").value};LS.set("sinav-ayar",a);
         const x=await post(Object.assign({a:"baslat",pin:PIN},a));if(x.hata){alert("Başlatılamadı");e.target.disabled=false;return;}r=Object.assign(x,{sonuclar:[]});ctl();res();};}
   };
