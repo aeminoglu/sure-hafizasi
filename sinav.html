@@ -151,6 +151,9 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 #rh{display:block}
 
 #dersSec .btn.on{background:var(--lapis);color:#fff;border-color:var(--lapis)}
+
+.del{border:0;background:none;color:var(--bad);font:inherit;font-size:.8rem;cursor:pointer;padding:.35rem .3rem;text-decoration:underline}
+.del:disabled{opacity:.5}
 .sent2{font-size:1.45rem;line-height:2.05}
 .defn{font-size:1rem;line-height:1.5;background:var(--paper);border-radius:12px;padding:12px 14px;text-align:center}
 .opts.col1{grid-template-columns:1fr}
@@ -388,10 +391,18 @@ function panel(r){
   $("#alBtn").onclick=async e=>{e.target.disabled=true;$("#alis").innerHTML='<div class="note">Yükleniyor…</div>';
     try{const x=await get({a:"ilerleme",pin:PIN});const L=(x.ogrenciler||[]).slice().sort((p,q)=>q.tamam-p.tamam||q.soru-p.soru);const kn=Object.values(BK);
       const gun=t=>{if(!t)return "";const d=Math.floor((new Date().setHours(0,0,0,0)-new Date(t).setHours(0,0,0,0))/864e5);return d<=0?"bugün":d===1?"dün":d+" gün önce";};
-      $("#alis").innerHTML=L.length?`<div class="note">${L.length} öğrenci · bir satıra dokununca konu konu ilerleme açılır.</div><table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Soru</th><th>Başarı</th><th>Tamam.</th><th>Gün</th><th>Son</th></tr></thead><tbody>${L.map((o,i)=>`<tr class="alr" style="cursor:pointer"><td>${i+1}</td><td>${esc(o.ad)}</td><td>${esc(o.no)}</td><td>${o.soru}</td><td>%${o.yuzde}</td><td><b>${o.tamam}</b>/${o.toplam}</td><td>${o.gun}</td><td>${gun(o.t)}</td></tr><tr hidden><td colspan="8" class="note">${String(o.konular).split(",").map((v,j)=>esc((kn[j]||"")+" "+v)).join(" · ")}</td></tr>`).join("")}</tbody></table>`:'<div class="note">Henüz alıştırmaya giren öğrenci yok.</div>';
-      document.querySelectorAll(".alr").forEach(tr=>tr.onclick=()=>{tr.nextElementSibling.hidden=!tr.nextElementSibling.hidden;});
+      $("#alis").innerHTML=L.length?`<div class="note">${L.length} öğrenci · bir satıra dokununca konu konu ilerleme açılır.</div><table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Soru</th><th>Başarı</th><th>Tamam.</th><th>Gün</th><th>Son</th><th></th></tr></thead><tbody>${L.map((o,i)=>`<tr class="alr" style="cursor:pointer"><td>${i+1}</td><td>${esc(o.ad)}</td><td>${esc(o.no)}</td><td>${o.soru}</td><td>%${o.yuzde}</td><td><b>${o.tamam}</b>/${o.toplam}</td><td>${o.gun}</td><td>${gun(o.t)}</td><td><button class="del" data-k="i|${esc(o.no)}|${esc(o.uyg)}">sil</button></td></tr><tr hidden><td colspan="9" class="note">${String(o.konular).split(",").map((v,j)=>esc((kn[j]||"")+" "+v)).join(" · ")}</td></tr>`).join("")}</tbody></table><button class="del" data-k="i*">Bütün alıştırma kayıtlarını sil</button>`:'<div class="note">Henüz alıştırmaya giren öğrenci yok.</div>';
+      document.querySelectorAll(".alr").forEach(tr=>tr.onclick=ev=>{if(ev.target.closest(".del"))return;tr.nextElementSibling.hidden=!tr.nextElementSibling.hidden;});
     }catch(err){$("#alis").innerHTML='<div class="note">Bağlantı kurulamadı.</div>';}
     e.target.disabled=false;e.target.textContent="Yenile";};
+  let armed="";
+  $("#app").addEventListener("click",async ev=>{const bt=ev.target.closest(".del");if(!bt)return;const k=bt.dataset.k;
+    if(armed!==k){armed=k;document.querySelectorAll(".del").forEach(x=>{if(x!==bt&&x.dataset.t)x.textContent=x.dataset.t;});bt.dataset.t=bt.dataset.t||bt.textContent;bt.textContent=k.endsWith("*")?"Emin misiniz? Silmek için tekrar dokunun":"emin misiniz?";return;}
+    armed="";bt.disabled=true;bt.textContent="siliniyor…";const p=k.split("|");
+    try{const d=k==="s*"?{tur:"sonuc",oturum:r.oturum,tum:true}:k==="i*"?{tur:"ilerleme",tum:true}:p[0]==="s"?{tur:"sonuc",oturum:r.oturum,no:p[1]}:{tur:"ilerleme",no:p[1],uyg:p[2]};
+      const x=await post(Object.assign({a:"sil",pin:PIN},d));if(x.hata)throw 0;
+      if(d.tur==="sonuc"){const y=await get({a:"sonuclar",pin:PIN});if(!y.hata){r=y;res();}}else $("#alBtn").click();
+    }catch(e){bt.disabled=false;bt.textContent="silinemedi, tekrar deneyin";}});
   $("#cik").onclick=e=>{e.preventDefault();sessionStorage.removeItem("sinav-pin");clearInterval(rpoll);location.hash="";};
   const ctl=()=>{
     if(r.acik){$("#ctl").innerHTML=`<div class="kind">Sınav açık · oturum ${esc(r.oturum)}</div><p class="prompt">${esc(konuAdi(r.konu))} · ${r.n} soru · ${r.sure} dk</p>
@@ -415,7 +426,7 @@ function panel(r){
     const P=L.filter(x=>x.durum!=="tekrar").map(x=>Number(x.puan)||0);
     const ist=P.length?{katilimci:P.length,ortalama:P.reduce((a,b)=>a+b,0)/P.length,enYuksek:Math.max(...P),enDusuk:Math.min(...P)}:null;
     $("#rh").innerHTML=r.oturum?(ist?statBox(ist,`Sonuçlar · ${esc(konuAdi(r.konu))} · oturum ${esc(r.oturum)}${r.acik?" · sınav sürüyor":""}`):`<h3 class="sh">Sonuçlar · oturum ${esc(r.oturum)}</h3>`):`<h3 class="sh">Henüz sınav yapılmadı</h3>`;
-    $("#res").innerHTML=L.length?`<table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Puan</th><th>D/Y/B</th><th>Süre</th><th>Not</th></tr></thead><tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.ad)}</td><td>${esc(x.no)}</td><td><b>${x.puan}</b></td><td>${x.dogru}/${x.yanlis}/${x.bos}</td><td>${fmt(x.sn*1000)}</td><td>${x.durum!=="zamanında"?esc(x.durum):""}${x.sekme?` sekme:${x.sekme}`:""}</td></tr>`).join("")}</tbody></table>`:`<div class="note">${r.acik?"Gönderen öğrenci olunca burada görünecek.":""}</div>`;
+    $("#res").innerHTML=L.length?`<table class="tbl"><thead><tr><th>#</th><th>Ad Soyad</th><th>No</th><th>Puan</th><th>D/Y/B</th><th>Süre</th><th>Not</th><th></th></tr></thead><tbody>${L.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.ad)}</td><td>${esc(x.no)}</td><td><b>${x.puan}</b></td><td>${x.dogru}/${x.yanlis}/${x.bos}</td><td>${fmt(x.sn*1000)}</td><td>${x.durum!=="zamanında"?esc(x.durum):""}${x.sekme?` sekme:${x.sekme}`:""}</td><td><button class="del" data-k="s|${esc(x.no)}">${armed==="s|"+x.no?"emin misiniz?":"sil"}</button></td></tr>`).join("")}</tbody></table><button class="del" data-k="s*">${armed==="s*"?"Emin misiniz? Silmek için tekrar dokunun":"Bu oturumun bütün sonuçlarını sil"}</button>`:`<div class="note">${r.acik?"Gönderen öğrenci olunca burada görünecek.":""}</div>`;
     renderAnaliz(r,L);
     $("#csv").onclick=()=>{const rows=[...(ist?[["Katılımcı",ist.katilimci,"Ortalama",fmt1(ist.ortalama),"En yüksek",ist.enYuksek,"En düşük",ist.enDusuk],[]]:[]),["Sıra","Ad Soyad","Numara","Puan","Doğru","Yanlış","Boş","Süre (sn)","Sekme değiştirme","Durum"],...L.map((x,i)=>[i+1,x.ad,x.no,x.puan,x.dogru,x.yanlis,x.bos,x.sn,x.sekme,x.durum])];
       const csv="﻿"+rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(";")).join("\r\n");
