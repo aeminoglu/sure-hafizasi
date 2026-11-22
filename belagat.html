@@ -129,6 +129,9 @@ nav.tabs button[aria-pressed="true"]{background:var(--lapis);border-color:var(--
 .opts.col1{grid-template-columns:1fr}
 .opt.aropt{font-family:var(--f-ar);font-size:1.2rem;line-height:1.8;text-align:right;justify-content:flex-end;padding:10px 14px;min-height:0}
 .opt.aropt span{display:block;width:100%}
+
+.gate{position:fixed;inset:0;z-index:50;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:16px}.gate .card{width:100%;max-width:420px}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:.85rem;color:var(--muted);margin:0 0 12px}.fl input{font:500 1rem var(--f-ui);color:var(--ink)}
 </style></head><body>
 <div class="wrap">
   <header>
@@ -176,6 +179,28 @@ const BEL=(function(){
 
 const D=BEL.D,KN=D.K;
 const KEY="belagat-alistirma-v1";
+const API="https://script.google.com/macros/s/AKfycbxDSbv4KTviDVBrOeHAYDvv8gdbPnZJmC2I2mU1tlg6Fv30Q2G3fQTE06roNh5wzJ0/exec";
+const WHO={get(){try{const w=JSON.parse(localStorage.getItem("sinav-ogrenci")||"null");return w&&w.ad&&w.no?w:null;}catch(e){return null;}},set(w){try{localStorage.setItem("sinav-ogrenci",JSON.stringify(w));}catch(e){}}};
+let dirty=0;
+function payload(){const w=WHO.get();if(!w)return null;const t=st.right+st.wrong;
+  return JSON.stringify({a:"ilerleme",uyg:"Belâgat",ad:w.ad,numara:w.no,soru:t,dogru:st.right,yanlis:st.wrong,yuzde:t?Math.round(100*st.right/t):0,
+    tamam:D.S.filter(learnedS).length,toplam:D.S.length,gun:Object.keys(st.days).length,
+    konular:Object.keys(KN).map(k=>{const a=D.S.filter(s=>s.k==k);return a.filter(learnedS).length+"/"+a.length;}).join(",")});}
+function sync(beacon,force){if(API.startsWith("__")||(!dirty&&!force))return;const body=payload();if(!body)return;const n=dirty;dirty=0;
+  try{if(beacon&&navigator.sendBeacon){navigator.sendBeacon(API,new Blob([body],{type:"text/plain;charset=utf-8"}));return;}
+    fetch(API,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body,keepalive:true}).catch(()=>{dirty+=n||1;});}catch(e){dirty+=n||1;}}
+function noteAnswer(){dirty++;if(dirty>=10)sync(false);}
+document.addEventListener("visibilitychange",()=>{if(document.hidden)sync(true);});
+function askWho(){const w=WHO.get()||{ad:"",no:""};const o=document.createElement("div");o.className="gate";
+  o.innerHTML=`<section class="card"><p class="prompt">Belâgat Alıştırması</p><div class="note" style="margin-bottom:12px">Adınızı ve numaranızı yazın. Çalışma ilerlemeniz (çözdüğünüz soru sayısı ve başarınız) öğretmeninizle paylaşılır.</div>
+    <label class="fl">Ad Soyad<input id="gAd" class="search" autocomplete="name"></label><label class="fl">Öğrenci numarası<input id="gNo" class="search" inputmode="numeric"></label>
+    <button class="next" id="gOk" style="width:100%">Başla</button><div class="note" id="gMsg"></div></section>`;
+  document.body.appendChild(o);$("#gAd").value=w.ad;$("#gNo").value=w.no;
+  $("#gOk").onclick=()=>{const ad=$("#gAd").value.trim(),no=$("#gNo").value.trim();if(ad.length<3||!no){$("#gMsg").textContent="Ad soyad ve numaranızı yazın.";return;}
+    WHO.set({ad,no});o.remove();showWho();sync(false,true);};}
+function showWho(){const w=WHO.get();let k=$("#kim");if(!k){k=document.createElement("div");k.id="kim";k.className="note";document.querySelector(".wrap").appendChild(k);}
+  k.innerHTML=w?`Öğrenci: <b></b> · <a class="applink" href="#" id="kimD">değiştir</a> · İlerlemeniz öğretmeninizle paylaşılır.`:"";
+  if(w){k.querySelector("b").textContent=w.ad+" ("+w.no+")";$("#kimD").onclick=e=>{e.preventDefault();askWho();};}}
 let st={right:0,wrong:0,streak:0,best:0,miss:{},ok:{},mode:"mix",range:"0",days:{},pm:{},first:null,last:null};
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s)st=Object.assign(st,s);}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st));}catch(e){}};
@@ -217,7 +242,7 @@ function answer(i){
   q.opts.forEach((o,j)=>{const b=$("#o"+j);b.disabled=true;if(o.ok)b.classList.add("right");else if(j===i)b.classList.add("wrong");});
   const dk=today();st.days[dk]=st.days[dk]||[0,0];st.days[dk][ok?0:1]++;st.pm[q.m]=st.pm[q.m]||[0,0];st.pm[q.m][ok?0:1]++;st.first=st.first||dk;st.last=Date.now();
   if(ok){st.right++;st.streak++;st.best=Math.max(st.best||0,st.streak);st.ok[k]=(st.ok[k]||0)+1;if(st.miss[k]){st.miss[k]--;if(!st.miss[k])delete st.miss[k];}}else{st.wrong++;st.streak=0;st.miss[k]=Math.min((st.miss[k]||0)+1,5);}
-  save();
+  save();noteAnswer();
   const it=q.item;let ex="";
   if(q.kind==="tanim")ex=`<b>${esc(it.t)}</b>${src(it)}`;
   else ex=`<div class="ayah sent2" style="text-align:right;background:transparent;padding:0">${it.ar}</div><span>${esc(it.tr)}</span><span>${esc(D.P[it.g].replace("?",""))}: <b>${esc(it.a)}</b>${src(it)}</span>`;
@@ -255,11 +280,12 @@ function renderProg(){
   renderStats();}
 function setMode(m){mode=m;document.querySelectorAll("#tabs button").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===m));
   const list=m==="liste",prog=m==="ilerleme";$("#listView").hidden=!list;$("#progView").hidden=!prog;$("#quiz").hidden=list||prog;$("#weak").hidden=prog;$("#filterBox").hidden=prog;
-  if(list)renderList();else if(prog)renderProg();else renderQuiz();if(!prog){st.mode=m;save();}}
+  if(list)renderList();else if(prog){renderProg();sync(false);}else renderQuiz();if(!prog){st.mode=m;save();}}
 $("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(b)setMode(b.dataset.mode);});
 $("#range").addEventListener("change",e=>{st.range=e.target.value;save();range=+e.target.value;if(mode==="liste"){renderList();renderStats();}else renderQuiz();});
 $("#range").value=String(range);if($("#range").value===""){$("#range").value="0";range=0;}
 setMode(["mix",...MODES,"liste"].includes(mode)?mode:"mix");
+showWho();if(!API.startsWith("__")){if(!WHO.get())askWho();else sync(false,true);}
 if("serviceWorker" in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{});}
 </script>
 </body></html>
