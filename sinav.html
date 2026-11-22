@@ -377,7 +377,7 @@ function renderAnaliz(r,L){
   $("#anBtn").onclick=()=>{el.dataset.acik=acik?"0":"1";renderAnaliz(r,L);};
 }
 function panel(r){
-  const lastKonu=LS.get("sinav-ayar",{konu:0,n:20,sure:5});
+  const lastKonu=LS.get("sinav-ayar-2",{konu:109,n:20,sure:10});
   $("#top").innerHTML=`Öğretmen paneli · <a class="applink" href="#" id="cik">çıkış</a>`;
   $("#app").innerHTML=`<section class="card" id="ctl"></section><div id="rh" class="sh"></div><div id="res"></div>
     <div id="analiz"></div>
@@ -398,7 +398,7 @@ function panel(r){
       const showSel=()=>{$("#secim").textContent="Seçilen: "+konuAdi(+$("#konu").value)+" · "+$("#n").value+" soru · "+$("#sure").value+" dk";};
       document.querySelectorAll("#dersSec button").forEach(bt=>bt.onclick=()=>{document.querySelectorAll("#dersSec button").forEach(x=>x.classList.toggle("on",x===bt));fillKonu(+bt.dataset.d,-1);});
       fillKonu((lastKonu.konu||0)>=100?100:0,lastKonu.konu||0);["#konu","#n","#sure"].forEach(s=>$(s).onchange=showSel);
-      $("#bas").onclick=async e=>{e.target.disabled=true;const a={konu:+$("#konu").value,n:+$("#n").value,sure:+$("#sure").value};LS.set("sinav-ayar",a);
+      $("#bas").onclick=async e=>{e.target.disabled=true;const a={konu:+$("#konu").value,n:+$("#n").value,sure:+$("#sure").value};LS.set("sinav-ayar-2",a);
         const x=await post(Object.assign({a:"baslat",pin:PIN},a));if(x.hata){alert("Başlatılamadı");e.target.disabled=false;return;}r=Object.assign(x,{sonuclar:[]});ctl();res();};}
   };
   const res=()=>{const L=(r.sonuclar||[]).slice().sort((a,b)=>b.puan-a.puan||a.sn-b.sn);
