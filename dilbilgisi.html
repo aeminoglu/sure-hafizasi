@@ -184,10 +184,11 @@ const BEL=mkBEL(BEL_DATA);
 const D=BEL.D,KN=D.K;
 const KEY="dilbilgisi-alistirma-v1";
 const API="https://script.google.com/macros/s/AKfycbxDSbv4KTviDVBrOeHAYDvv8gdbPnZJmC2I2mU1tlg6Fv30Q2G3fQTE06roNh5wzJ0/exec";
+const SK=(new URLSearchParams(location.search).get("s")||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,12);
 const WHO={get(){try{const w=JSON.parse(localStorage.getItem("sinav-ogrenci")||"null");return w&&w.ad&&w.no?w:null;}catch(e){return null;}},set(w){try{localStorage.setItem("sinav-ogrenci",JSON.stringify(w));}catch(e){}}};
 let dirty=0;
 function payload(){const w=WHO.get();if(!w)return null;const t=st.right+st.wrong;
-  return JSON.stringify({a:"ilerleme",uyg:"Dil Bilgisi",ad:w.ad,numara:w.no,soru:t,dogru:st.right,yanlis:st.wrong,yuzde:t?Math.round(100*st.right/t):0,
+  return JSON.stringify({a:"ilerleme",k:SK,uyg:"Dil Bilgisi",ad:w.ad,numara:w.no,soru:t,dogru:st.right,yanlis:st.wrong,yuzde:t?Math.round(100*st.right/t):0,
     tamam:D.S.filter(learnedS).length,toplam:D.S.length,gun:Object.keys(st.days).length,
     konular:Object.keys(KN).map(k=>D.S.filter(s=>s.k==k).filter(learnedS).length).join(",")});}
 function sync(beacon,force){if(API.startsWith("__")||(!dirty&&!force))return;const body=payload();if(!body)return;const n=dirty;dirty=0;
